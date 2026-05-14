@@ -1,4 +1,8 @@
-﻿using System;
+﻿//Họ Tên :Bùi Quang Hào
+//MSSV : 2123110043
+//version : 1.0
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

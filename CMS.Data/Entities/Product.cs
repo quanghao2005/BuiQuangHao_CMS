@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+//Họ Tên :Bùi Quang Hào
+//MSSV : 2123110043
+//version : 1.0
+
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
