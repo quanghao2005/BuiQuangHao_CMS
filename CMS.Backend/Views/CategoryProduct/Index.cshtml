@@ -1,0 +1,29 @@
+﻿@using System.Linq
+@model IEnumerable<CMS.Data.Entities.CategoryProduct>
+<div class="container mt-4">
+    <h2 class="text-secondary mb-3">BÀI TẬP 3: LIÊN KẾT DANH MỤC - SẢN PHẨM</h2>
+    <table class="table table-bordered text-center shadow-sm">
+        <thead class="table-secondary">
+            <tr>
+                <th>Mã Danh Mục (CategoryId)</th>
+                <th>Mã Sản Phẩm (ProductId)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cp in Model)
+            {
+                <tr>
+                    @* Chuẩn 100% theo database gốc: CategoryId và ProductId *@
+                    <td><span class="badge bg-primary">Mã DM: @cp.Id</span></td>
+                    <td>
+                        <span class="badge bg-dark">
+                            Mã SP: @(cp.Products != null && cp.Products.Any()
+                                                    ? string.Join(", ", cp.Products.Select(p => p.Id))
+                                                    : "—")
+                    </span>s
+                </td>
+            </tr>
+                        }
+        </tbody>
+    </table>
+</div>

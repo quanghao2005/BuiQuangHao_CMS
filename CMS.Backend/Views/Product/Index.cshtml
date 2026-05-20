@@ -1,0 +1,21 @@
+﻿@model IEnumerable<CMS.Data.Entities.Product>
+<div class="container mt-4">
+    <h2 class="text-primary mb-3">DANH SÁCH SẢN PHẨM</h2>
+    <table class="table table-bordered table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên Sản Phẩm</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>@p.Id</td>
+                    <td><strong>@p.Name</strong></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

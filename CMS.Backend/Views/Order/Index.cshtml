@@ -1,0 +1,30 @@
+﻿@model IEnumerable<CMS.Data.Entities.Order>
+<div class="container mt-4">
+    <h2 class="text-warning mb-3">BÀI TẬP 6: DANH SÁCH ĐƠN HÀNG</h2>
+    <table class="table table-bordered table-hover shadow-sm">
+        <thead class="table-warning text-dark">
+            <tr>
+                <th>ID Đơn Hàng</th>
+                <th>Ngày Đặt</th>
+                <th>Mã Khách Hàng</th>
+                <th>Tổng Tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var o in Model)
+            {
+                <tr>
+                    <td>@o.Id</td>
+                    <td>@o.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>Khách hàng #@o.CustomerId</td>
+                    @* Chuẩn 100% theo database gốc: TotalAmount *@
+                    <td>
+                        <span class="badge bg-success">
+                            @(o.TotalAmount != null ? string.Format("{0:#,##0}", o.TotalAmount) : "0") đ
+                        </span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>â

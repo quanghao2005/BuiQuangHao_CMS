@@ -29,5 +29,7 @@ namespace CMS.Data.Entities
 
         public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
 
+        [NotMapped]
+        public decimal? TotalAmount => OrderDetails?.Sum(od => od.UnitPrice * od.Quantity);
     }
 }
