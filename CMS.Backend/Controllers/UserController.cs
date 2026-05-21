@@ -1,33 +1,91 @@
-﻿//Họ Tên :Bùi Quang Hào
-//MSSV : 2123110043
-//version : 1.0 (Chức năng Xem danh sách thành viên)
-
+﻿// Họ Tên: Bùi Quang Hào
+// MSSV: 2123110043
 using Microsoft.AspNetCore.Mvc;
-using CMS.Data; // Để hệ thống tìm thấy ApplicationDbContext
-using CMS.Data.Entities; // Để nhận diện lớp dữ liệu User
+using CMS.Data;
+using CMS.Data.Entities;
 using System.Linq;
 
 namespace CMS.Backend.Controllers
 {
     public class UserController : Controller
     {
-        // Khai báo bối cảnh kết nối cơ sở dữ liệu
         private readonly ApplicationDbContext _context;
+        public UserController(ApplicationDbContext context) { _context = context; }
 
-        // Tiêm ApplicationDbContext thông qua Constructor
-        public UserController(ApplicationDbContext context)
+        public IActionResult Index() => View(_context.Users.ToList());
+
+        [HttpGet] public IActionResult Create() => View();
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(User model)
         {
-            _context = context;
+            ModelState.Remove("Id"); // Bỏ kiểm tra Id tự tăng
+
+            if (string.IsNullOrEmpty(model.Role)) model.Role = "Editor";
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Users.Add(model);
+                    _context.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                catch (System.Exception ex)
+                {
+                    ModelState.AddModelError("", "Lỗi lưu dữ liệu: " + ex.Message);
+                }
+            }
+            return View(model);
         }
 
-        // Action Index: Lấy toàn bộ danh sách thành viên từ SQL Server
-        public IActionResult Index()
+        [HttpGet]
+        public IActionResult Edit(int id)
         {
-            // Lấy dữ liệu thật từ bảng Users
-            var users = _context.Users.ToList();
+            var user = _context.Users.Find(id);
+            return user == null ? NotFound() : View(user);
+        }
 
-            // Truyền danh sách thành viên sang View để hiển thị lên bảng
-            return View(users);
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(User model)
+        {
+            // Cần lấy lại đối tượng cũ để tránh mất mát dữ liệu không mong muốn
+            var userInDb = _context.Users.Find(model.Id);
+            if (userInDb == null) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    userInDb.FullName = model.FullName;
+                    userInDb.PasswordHash = model.PasswordHash;
+                    userInDb.Role = model.Role;
+
+                    _context.Users.Update(userInDb);
+                    _context.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                catch (System.Exception ex)
+                {
+                    ModelState.AddModelError("", "Lỗi cập nhật: " + ex.Message);
+                }
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            var user = _context.Users.Find(id);
+            if (user != null)
+            {
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+            }
+            return RedirectToAction("Index");
         }
     }
 }

@@ -1,23 +1,54 @@
-﻿
-@model IEnumerable<CMS.Data.Entities.Category>
+﻿@model IEnumerable<CMS.Data.Entities.Category>
 
-<h2 class="text-primary">DANH SÁCH DANH MỤC (DỮ LIỆU MẪU)</h2>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Tên danh mục</th>
-            <th>Mô tả</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-dark fw-bold">DANH SÁCH DANH MỤC</h2>
+        <a href="/Category/Create" class="btn btn-success rounded-pill px-3"><i class="bi bi-plus-lg"></i> Thêm Danh Mục</a>
+    </div>
+
+    @* Hiển thị thông báo lỗi nếu xóa không thành công (Ví dụ do dính khóa ngoại bài viết) *@
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger shadow-sm alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <table class="table table-bordered table-hover shadow-sm text-center">
+        <thead class="table-dark">
             <tr>
-                <td>@item.Id</td>
-                <td>@item.Name</td>
-                <td>@item.Description</td>
+                <th>ID</th>
+                <th>Tên Danh Mục</th>
+                <th>Mô Tả</th>
+                <th style="width: 200px;">Hành Động</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td class="fw-bold text-primary">@item.Name</td>
+                    <td>@item.Description</td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-2">
+                            @* Nút Sửa dẫn sang trang Edit kèm ID *@
+                            <a href="/Category/Edit/@item.Id" class="btn btn-sm btn-warning rounded-pill px-3">
+                                <i class="bi bi-pencil-fill"></i> Sửa
+                            </a>
+
+                            @* Form nút Xóa (Sử dụng phương thức POST kèm hộp thoại xác nhận) *@
+                            <form asp-controller="Category" asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa danh mục này không?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">
+                                    <i class="bi bi-trash-fill"></i> Xóa
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

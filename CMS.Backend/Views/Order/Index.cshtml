@@ -1,30 +1,39 @@
 ﻿@model IEnumerable<CMS.Data.Entities.Order>
+
 <div class="container mt-4">
-    <h2 class="text-warning mb-3">BÀI TẬP 6: DANH SÁCH ĐƠN HÀNG</h2>
-    <table class="table table-bordered table-hover shadow-sm">
-        <thead class="table-warning text-dark">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold text-dark">QUẢN LÝ ĐƠN HÀNG</h3>
+        <a href="/Order/Create" class="btn btn-success rounded-pill"><i class="bi bi-plus-lg"></i> Tạo Đơn Hàng</a>
+    </div>
+
+    <table class="table table-bordered table-hover bg-white shadow-sm text-center">
+        <thead class="table-dark">
             <tr>
-                <th>ID Đơn Hàng</th>
-                <th>Ngày Đặt</th>
-                <th>Mã Khách Hàng</th>
-                <th>Tổng Tiền</th>
+                <th>Mã Đơn Hàng (ID)</th>
+                <th>Ngày Đặt Hàng</th>
+                <th>Hành Động</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var o in Model)
+            @if (Model != null)
             {
-                <tr>
-                    <td>@o.Id</td>
-                    <td>@o.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
-                    <td>Khách hàng #@o.CustomerId</td>
-                    @* Chuẩn 100% theo database gốc: TotalAmount *@
-                    <td>
-                        <span class="badge bg-success">
-                            @(o.TotalAmount != null ? string.Format("{0:#,##0}", o.TotalAmount) : "0") đ
-                        </span>
-                    </td>
-                </tr>
+                foreach (var o in Model)
+                {
+                    <tr>
+                        <td><strong>#@o.Id</strong></td>
+                        <td>@o.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="/Order/Edit/@o.Id" class="btn btn-sm btn-warning rounded-pill px-3">Sửa</a>
+                                <form action="/Order/Delete/@o.Id" method="post" onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">Xóa</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
-</div>â
+</div>

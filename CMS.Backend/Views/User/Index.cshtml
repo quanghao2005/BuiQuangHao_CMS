@@ -2,40 +2,34 @@
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="text-dark">QUẢN LÝ THÀNH VIÊN</h2>
-        <button class="btn btn-success btn-sm">+ Thêm thành viên mới</button>
+        <h3 class="fw-bold">QUẢN LÝ TÀI KHOẢN</h3>
+        <a href="/User/Create" class="btn btn-success rounded-pill"><i class="bi bi-plus-lg"></i> Thêm Tài Khoản</a>
     </div>
 
-    <table class="table table-hover shadow-sm border">
-        <thead class="table-light">
+    <table class="table table-bordered table-hover bg-white shadow-sm text-center">
+        <thead class="table-dark">
             <tr>
                 <th>ID</th>
                 <th>Tên Đăng Nhập</th>
-                <th>Họ Và Tên</th>
                 <th>Quyền Hạn</th>
-                <th>Thao Tác</th>
+                <th>Hành Động</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var user in Model)
+            @foreach (var u in Model)
             {
                 <tr>
-                    <td>@user.Id</td>
-                    <td><strong>@user.Username</strong></td>
-                    <td>@user.FullName</td>
+                    <td>@u.Id</td>
+                    <td class="fw-bold">@u.Username</td>
+                    <td><span class="badge bg-primary">@u.Role</span></td>
                     <td>
-                        @if (user.Role == "Administrator")
-                        {
-                            <span class="badge bg-danger">@user.Role</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-info text-dark">@user.Role</span>
-                        }
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-warning">Sửa</button>
-                        <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="/User/Edit/@u.Id" class="btn btn-sm btn-warning rounded-pill px-3">Sửa</a>
+                            <form action="/User/Delete/@u.Id" method="post" onsubmit="return confirm('Xóa tài khoản này?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">Xóa</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             }
