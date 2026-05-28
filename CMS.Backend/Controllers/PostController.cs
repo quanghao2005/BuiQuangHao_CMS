@@ -2,6 +2,7 @@
 // MSSV: 2123110043
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using CMS.Data;
 using CMS.Data.Entities;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +11,7 @@ using System.Linq;
 
 namespace CMS.Backend.Controllers
 {
+    [Authorize]
     public class PostController : Controller
     {
         private readonly ApplicationDbContext _context;

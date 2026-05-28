@@ -5,9 +5,10 @@ using CMS.Data;
 using CMS.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-
+using Microsoft.AspNetCore.Authorization;
 namespace CMS.Backend.Controllers
 {
+    [Authorize]
     public class CustomerController : Controller
     {
         private readonly ApplicationDbContext _context;

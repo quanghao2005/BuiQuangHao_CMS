@@ -14,6 +14,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// --- BỔ SUNG BUỔI 5: ĐĂNG KÝ DỊCH VỤ XÁC THỰC COOKIE ---
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,6 +35,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// --- BỔ SUNG BUỔI 5: KÍCH HOẠT XÁC THỰC COOKIE ---
+app.UseAuthentication();
 
 app.UseAuthorization();
 

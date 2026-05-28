@@ -4,11 +4,12 @@
 
 using CMS.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using CMS.Data;
 using System.Linq;
-
 namespace CMS.Backend.Controllers
 {
+    [Authorize] 
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _context;

@@ -66,8 +66,22 @@
             <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
                 <i class="bi bi-person-badge fs-3"></i>
             </div>
-            <h6 class="text-white mb-0 fw-bold">Bùi Quang Hào</h6>
-            <small class="text-muted">MSSV: 2123110043</small>
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <h6 class="text-white mb-0 fw-bold">@User.FindFirst("FullName")?.Value</h6>
+                <span class="badge bg-danger mt-1 small">@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</span>
+                <div class="mt-2">
+                    <a class="btn btn-xs btn-outline-light text-decoration-none py-0 px-2"
+                       style="font-size: 0.75rem;"
+                       href="/Account/Logout" target="_top">Đăng xuất</a>
+                </div>
+            }
+            else
+            {
+                <h6 class="text-white mb-0 fw-bold">Bùi Quang Hào</h6>
+                <small class="text-muted">MSSV: 2123110043</small>
+            }
         </div>
 
         <ul class="nav flex-column">
@@ -101,11 +115,15 @@
                     <i class="bi bi-cart-check-fill"></i> Quản Lý Đơn Hàng
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/User">
-                    <i class="bi bi-shield-lock-fill"></i> Tài Khoản Hệ Thống
-                </a>
-            </li>
+
+            @if (User.Identity.IsAuthenticated && User.IsInRole("Administrator"))
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="/User">
+                        <i class="bi bi-shield-lock-fill"></i> Tài Khoản Hệ Thống
+                    </a>
+                </li>
+            }
         </ul>
 
         <div class="position-absolute bottom-0 start-0 w-100 p-3 text-center text-muted" style="font-size: 0.8rem; border-top: 1px solid #3d4145;">

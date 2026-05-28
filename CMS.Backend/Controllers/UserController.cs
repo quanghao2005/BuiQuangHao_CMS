@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using CMS.Data;
 using CMS.Data.Entities;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CMS.Backend.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _context;

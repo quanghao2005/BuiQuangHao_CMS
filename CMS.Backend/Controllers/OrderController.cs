@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using CMS.Data;
 using CMS.Data.Entities;
 using System.Linq;
-
+using Microsoft.AspNetCore.Authorization;
 namespace CMS.Backend.Controllers
 {
+    [Authorize]
     public class OrderController : Controller
     {
         private readonly ApplicationDbContext _context;
