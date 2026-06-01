@@ -5,6 +5,7 @@ using CMS.Data;
 using CMS.Data.Entities;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+
 namespace CMS.Backend.Controllers
 {
     [Authorize]
@@ -28,6 +29,8 @@ namespace CMS.Backend.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            // Lấy danh sách danh mục truyền sang View để làm ô chọn Dropdown
+            ViewBag.Categories = _context.CategoryProducts.ToList();
             return View();
         }
 
@@ -36,17 +39,27 @@ namespace CMS.Backend.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Product model)
         {
-            try
+            ModelState.Remove("Id"); // Bỏ qua kiểm tra Id tự tăng của Entity
+
+            if (ModelState.IsValid)
             {
-                _context.Products.Add(model);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+                try
+                {
+                    _context.Products.Add(model);
+                    _context.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                catch (System.Exception ex)
+                {
+                    // Lấy thông tin lỗi sâu nhất từ SQL Server (InnerException) nếu có
+                    var errorMsg = ex.InnerException?.Message ?? ex.Message;
+                    ModelState.AddModelError("", "Lỗi lưu SQL: " + errorMsg);
+                }
             }
-            catch (System.Exception ex)
-            {
-                ModelState.AddModelError("", "Lỗi lưu SQL: " + ex.Message);
-                return View(model);
-            }
+
+            // Nếu dữ liệu không hợp lệ hoặc lỗi SQL, nạp lại danh mục trước khi trả về View
+            ViewBag.Categories = _context.CategoryProducts.ToList();
+            return View(model);
         }
 
         // 4. GET: Form Sửa Sản Phẩm
@@ -55,6 +68,9 @@ namespace CMS.Backend.Controllers
         {
             var product = _context.Products.Find(id);
             if (product == null) return NotFound();
+
+            // Nạp danh sách danh mục để form Sửa cũng chọn lại được danh mục
+            ViewBag.Categories = _context.CategoryProducts.ToList();
             return View(product);
         }
 
@@ -63,17 +79,24 @@ namespace CMS.Backend.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Product model)
         {
-            try
+            if (ModelState.IsValid)
             {
-                _context.Products.Update(model);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+                try
+                {
+                    _context.Products.Update(model);
+                    _context.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                catch (System.Exception ex)
+                {
+                    var errorMsg = ex.InnerException?.Message ?? ex.Message;
+                    ModelState.AddModelError("", "Lỗi cập nhật SQL: " + errorMsg);
+                }
             }
-            catch (System.Exception ex)
-            {
-                ModelState.AddModelError("", "Lỗi cập nhật SQL: " + ex.Message);
-                return View(model);
-            }
+
+            // Nạp lại danh sách danh mục nếu xảy ra lỗi validate
+            ViewBag.Categories = _context.CategoryProducts.ToList();
+            return View(model);
         }
 
         // 6. POST: Thực thi Xóa Sản Phẩm

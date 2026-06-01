@@ -2,30 +2,59 @@
  * Sinh viên: Bùi Quang Hào
  * MSSV: 2123110043
  */
-using Microsoft.EntityFrameworkCore;
 using CMS.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- BƯỚC QUAN TRỌNG: ĐĂNG KÝ DBCONTEXT VÀO HỆ THỐNG ---
+// =================================================================
+// 1. KHU VỰC ĐĂNG KÝ DỊCH VỤ (SERVICES CONTAINER)
+// =================================================================
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// --- BỔ SUNG BUỔI 5: ĐĂNG KÝ DỊCH VỤ XÁC THỰC COOKIE ---
-builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+// --- CẤU HÌNH CORS CHO REACTJS ---
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
     {
-        options.LoginPath = "/Account/Login";
-        options.AccessDeniedPath = "/Account/AccessDenied";
+        policy.WithOrigins("http://localhost:3000") // Cho phép ReactJS ở port 3000
+              .AllowAnyHeader()                     // Cho phép mọi Header
+              .AllowAnyMethod()                     // Cho phép mọi phương thức HTTP
+              .AllowCredentials();                  // Hỗ trợ truyền Cookie/Session
     });
+});
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/Account/Login";
+            options.AccessDeniedPath = "/Account/AccessDenied";
+        });
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+// =================================================================
+// 2. KHU VỰC CẤU HÌNH MIDDLEWARE (REQUEST PIPELINE)
+// =================================================================
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ThaiCMS Web API v1");
+        c.RoutePrefix = "swagger";
+    });
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -36,10 +65,17 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// --- BỔ SUNG BUỔI 5: KÍCH HOẠT XÁC THỰC COOKIE ---
-app.UseAuthentication();
+// --- KÍCH HOẠT CORS ĐÚNG VỊ TRÍ ---
+app.UseCors("AllowReactApp");
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+// =================================================================
+// 3. KHU VỰC ĐỊNH TUYẾN PHÂN LUỒNG (ROUTING MAP)
+// =================================================================
+
+app.MapControllers();
 
 app.MapControllerRoute(
     name: "default",

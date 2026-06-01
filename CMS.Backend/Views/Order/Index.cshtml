@@ -1,39 +1,83 @@
 ﻿@model IEnumerable<CMS.Data.Entities.Order>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Quản lý đơn hàng";
+}
 
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="fw-bold text-dark">QUẢN LÝ ĐƠN HÀNG</h3>
-        <a href="/Order/Create" class="btn btn-success rounded-pill"><i class="bi bi-plus-lg"></i> Tạo Đơn Hàng</a>
-    </div>
+    <h4 class="text-dark fw-bold mb-3"><i class="bi bi-cart-check-fill"></i> QUẢN LÝ ĐƠN HÀNG</h4>
 
-    <table class="table table-bordered table-hover bg-white shadow-sm text-center">
-        <thead class="table-dark">
-            <tr>
-                <th>Mã Đơn Hàng (ID)</th>
-                <th>Ngày Đặt Hàng</th>
-                <th>Hành Động</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null)
-            {
-                foreach (var o in Model)
-                {
+    <div class="card shadow">
+        <div class="card-body p-0">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-dark">
                     <tr>
-                        <td><strong>#@o.Id</strong></td>
-                        <td>@o.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
-                        <td>
-                            <div class="d-flex justify-content-center gap-2">
-                                <a href="/Order/Edit/@o.Id" class="btn btn-sm btn-warning rounded-pill px-3">Sửa</a>
-                                <form action="/Order/Delete/@o.Id" method="post" onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?');">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">Xóa</button>
-                                </form>
-                            </div>
-                        </td>
+                        <th class="text-center" style="width: 80px;">Mã Đơn</th>
+                        <th>Khách Hàng (Mã KH)</th>
+                        <th>Ngày Đặt</th>
+                        <th>Tổng Tiền</th>
+                        <th class="text-center">Trạng Thái</th>
+                        <th class="text-center" style="width: 240px;">Hành Động</th>
                     </tr>
-                }
-            }
-        </tbody>
-    </table>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-center fw-bold">#@item.Id</td>
+                                <td class="fw-bold">
+                                    @(item.Customer != null ? item.Customer.FullName : "Khách hàng #" + item.CustomerId)
+                                </td>
+                                <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="text-danger fw-bold">
+                                    @(item.TotalAmount.HasValue? item.TotalAmount.Value.ToString("N0") + " đ" : "0 đ")
+                                </td>
+                                <td class="text-center">
+                                    @if (item.Status == 0)
+                                    {
+                                        <span class="badge bg-warning text-dark px-2 py-1">Chờ duyệt</span>
+                                    }
+                                    else if (item.Status == 1)
+                                    {
+                                        <span class="badge bg-primary px-2 py-1">Đang giao</span>
+                                    }
+                                    else if (item.Status == 2)
+                                    {
+                                        <span class="badge bg-success px-2 py-1">Đã xong</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <a href="/Order/Details/@item.Id" class="btn btn-sm btn-info text-white fw-bold">
+                                            <i class="bi bi-eye-fill"></i> Xem Đơn
+                                        </a>
+
+                                        <a href="/Order/Edit/@item.Id" class="btn btn-sm btn-warning fw-bold">
+                                            <i class="bi bi-pencil-square"></i> Sửa
+                                        </a>
+
+                                        <form action="/Order/Delete/@item.Id" method="post"
+                                              onsubmit="return confirm('Bạn có chắc muốn xóa đơn hàng này?');" class="m-0">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-danger fw-bold">
+                                                <i class="bi bi-trash-fill"></i> Xóa
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">Chưa có đơn hàng nào trong hệ thống.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
