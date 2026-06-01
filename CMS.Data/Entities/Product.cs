@@ -1,41 +1,35 @@
-﻿//Họ Tên :Bùi Quang Hào
-//MSSV : 2123110043
-//version : 1.0
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-
 namespace CMS.Data.Entities
 {
+    [Table("Products")]
     public class Product
     {
         [Key]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Tên sản phẩm không được để trống")]
+        [StringLength(250)]
         public string Name { get; set; }
 
-        public string? Description { get; set; }
-
-        [Range(0, double.MaxValue)]
+        [Required(ErrorMessage = "Giá sản phẩm không được để trống")]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
 
         public int StockQuantity { get; set; }
 
+        public string? Description { get; set; }
+
+        // --- ĐÃ BỔ SUNG: Khai báo ImageUrl cho phép nhận giá trị rỗng (string?) ---
+        // Thuộc tính này bắt buộc phải có để gọt tỉa dữ liệu JSON trong ProductsController
         public string? ImageUrl { get; set; }
 
-        // Khóa ngoại nối tới CategoryProduct
-        public int CategoryProductId { get; set; }
+        [Required]
+        public int CategoryProductId { get; set; } // Mã liên kết khóa ngoại
 
         [ForeignKey("CategoryProductId")]
-        public virtual CategoryProduct? CategoryProduct { get; set; }
-
+        public virtual CategoryProduct? CategoryProduct { get; set; } // Đối tượng liên kết điều hướng
     }
 }
