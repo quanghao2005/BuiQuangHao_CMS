@@ -90,9 +90,10 @@
                     <i class="bi bi-speedometer2"></i> Trang Chủ
                 </a>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link" href="/Category">
-                    <i class="bi bi-grid-1x2-fill"></i> Quản Lý Danh Mục
+                    <i class="bi bi-grid-1x2-fill"></i> Danh Mục Bài Viết
                 </a>
             </li>
             <li class="nav-item">
@@ -100,11 +101,19 @@
                     <i class="bi bi-newspaper"></i> Quản Lý Bài Viết
                 </a>
             </li>
+
+            <hr class="text-secondary my-2 mx-3">
+            <li class="nav-item">
+                <a class="nav-link" href="/CategoryProduct">
+                    <i class="bi bi-tags-fill"></i> Danh Mục Sản Phẩm
+                </a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" href="/Product">
                     <i class="bi bi-box-seam-fill"></i> Quản Lý Sản Phẩm
                 </a>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link" href="/Customer">
                     <i class="bi bi-people-fill"></i> Khách Hàng
@@ -118,6 +127,7 @@
 
             @if (User.Identity.IsAuthenticated && User.IsInRole("Administrator"))
             {
+                <hr class="text-secondary my-2 mx-3">
                 <li class="nav-item">
                     <a class="nav-link" href="/User">
                         <i class="bi bi-shield-lock-fill"></i> Tài Khoản Hệ Thống
