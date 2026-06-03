@@ -1,16 +1,21 @@
 ﻿import axiosClient from '../api/axiosClient';
 
 const blogService = {
-    // Hàm gọi API lấy danh mục các chủ đề bài viết
-    getBlogCategories: () => {
-        const url = '/Categories'; // Khớp với Route quản lý chuyên mục tin tức ở Backend
-        return axiosClient.get(url);
+    // Lấy danh sách bài viết (Khớp với /api/Posts trong Swagger)
+    getAllPosts: () => {
+        return axiosClient.get('/Posts');
     },
 
-    // Hàm gọi API lấy toàn bộ các bài viết (Mẹo phối đồ, tin tức thời trang)
-    getAllPosts: () => {
-        const url = '/Posts'; // Khớp với Route quản lý bài viết ở Backend
-        return axiosClient.get(url);
+    // Lấy chi tiết bài viết (Khớp với /api/Posts/{id} trong Swagger)
+    getPostById: (id) => {
+        return axiosClient.get(`/Posts/${id}`);
+    },
+
+    // Lưu ý: Hiện tại Swagger chưa có /api/Categories
+    // Nếu bạn muốn lấy danh mục, hãy tạo Controller tương ứng ở Backend
+    getBlogCategories: () => {
+        // Sau khi tạo Controller ở Backend và nó hiện trong Swagger, hãy thay URL vào đây
+        return axiosClient.get('/Categories');
     }
 };
 
