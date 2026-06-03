@@ -63,7 +63,15 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseRouting();
+app.UseRouting(); // Bắt đầu nhận diện phân luồng tuyến đường
+
+// --- [VỊ TRÍ ĐẶT CORS CHUẨN]: Phải nằm ngay giữa UseRouting và UseAuthentication ---
+app.UseCors("AllowAll");
+
+// --- BUỔI 5: KÍCH HOẠT XÁC THỰC VÀ PHÂN QUYỀN COOKIE ---
+app.UseAuthentication(); // Bước A: Xác nhận "Anh là ai?"
+app.UseAuthorization();  // Bước B: Xác nhận "Anh được làm gì?"
+
 
 // --- KÍCH HOẠT CORS ĐÚNG VỊ TRÍ ---
 app.UseCors("AllowReactApp");
@@ -77,6 +85,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Phân luồng B (Buổi 1): Giữ lại bản đồ đường đi mặc định cho trang quản trị Web MVC cũ
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
