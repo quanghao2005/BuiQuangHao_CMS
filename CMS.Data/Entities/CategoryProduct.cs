@@ -1,16 +1,11 @@
-﻿//Họ Tên :Bùi Quang Hào
-//MSSV : 2123110043
-//version : 1.0
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CMS.Data.Entities
 {
+    [Table("CategoryProducts")]
     public class CategoryProduct
     {
         [Key]
@@ -24,6 +19,5 @@ namespace CMS.Data.Entities
 
         // Quan hệ: Một danh mục có nhiều sản phẩm
         public virtual ICollection<Product>? Products { get; set; }
-
     }
 }

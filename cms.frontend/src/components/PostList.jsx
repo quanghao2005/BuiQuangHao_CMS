@@ -1,0 +1,70 @@
+﻿import React, { useState, useEffect } from 'react';
+import blogService from '../services/blogService';
+
+const PostList = () => {
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                setLoading(true);
+                const data = await blogService.getAllPosts();
+                // Đảm bảo dữ liệu là mảng, phòng trường hợp API trả về null/undefined
+                setPosts(Array.isArray(data) ? data : []);
+            } catch (error) {
+                console.error("Lỗi khi tải danh sách bài viết:", error);
+                setPosts([]); // Gán mảng rỗng nếu lỗi
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPosts();
+    }, []);
+
+    if (loading) {
+        return <div className="text-center my-4">Đang tải tin tức thời trang...</div>;
+    }
+
+    return (
+        <div className="mt-5">
+            <h4 className="mb-4 text-uppercase text-secondary font-weight-bold border-bottom pb-2">
+                <i className="fa-solid fa-newspaper text-info me-2"></i> Xu hướng & Bí quyết mặc đẹp
+            </h4>
+
+            {posts.length === 0 ? (
+                <p className="text-muted">Chưa có bài viết tin tức nào.</p>
+            ) : (
+                <div className="row">
+                    {posts.map((post) => (
+                        <div className="col-12 mb-3" key={post.id || Math.random()}>
+                            <div className="card shadow-sm border-light">
+                                <div className="card-body">
+                                    <h5 className="card-title font-weight-bold">
+                                        {/* Nếu bạn dùng React Router, hãy đổi href thành <Link to={`/post/${post.id}`}> */}
+                                        <a href={`/post/${post.id}`} className="text-dark text-decoration-none">
+                                            {post.title}
+                                        </a>
+                                    </h5>
+                                    <p className="card-text text-muted small">
+                                        {post.shortDescription || 'Đang cập nhật nội dung tóm tắt cho bài viết...'}
+                                    </p>
+                                    <div className="d-flex justify-content-between align-items-center text-secondary small">
+                                        <span>
+                                            <i className="fa-regular fa-calendar me-1"></i>
+                                            {post.createdDate ? new Date(post.createdDate).toLocaleDateString('vi-VN') : 'N/A'}
+                                        </span>
+                                        <span className="badge bg-info text-dark px-2 py-1">Xem thêm</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default PostList;
