@@ -61,7 +61,7 @@ namespace CMS.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CategoriesProducts");
+                    b.ToTable("CategoryProducts");
                 });
 
             modelBuilder.Entity("CMS.Data.Entities.Customer", b =>
@@ -203,7 +203,8 @@ namespace CMS.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
