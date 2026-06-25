@@ -1,8 +1,156 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Bảng Điều Khiển (Dashboard)";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Bùi Quang Hào MSSV:2123110043</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark mb-0">Bảng Điều Khiển</h2>
+        <div>
+            <span class="text-muted">Xin chào, hệ thống quản trị HaoCMS!</span>
+        </div>
+    </div>
+
+    <!-- 4 Thẻ Thống Kê (Cards) -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2 border-0" style="border-left: 4px solid #0d6efd;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1" style="font-size: 0.85rem; font-weight: 700;">
+                                Tổng Sản Phẩm
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800 fw-bold fs-3">@ViewBag.TotalProducts</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-box-seam fs-1 text-gray-300" style="color: #dddfeb;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card shadow h-100 py-2 border-0" style="border-left: 4px solid #198754;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1" style="font-size: 0.85rem; font-weight: 700;">
+                                Tổng Khách Hàng
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800 fw-bold fs-3">@ViewBag.TotalCustomers</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-people fs-1" style="color: #dddfeb;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card shadow h-100 py-2 border-0" style="border-left: 4px solid #ffc107;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1" style="font-size: 0.85rem; font-weight: 700;">
+                                Tổng Đơn Hàng
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800 fw-bold fs-3">@ViewBag.TotalOrders</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-cart-check fs-1" style="color: #dddfeb;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card shadow h-100 py-2 border-0" style="border-left: 4px solid #dc3545;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1" style="font-size: 0.85rem; font-weight: 700;">
+                                Doanh Thu Ước Tính
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800 fw-bold fs-4">@string.Format("{0:N0}", ViewBag.TotalRevenue) ₫</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-currency-dollar fs-1" style="color: #dddfeb;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng Đơn Hàng Gần Đây -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4 border-0">
+                <div class="card-header py-3 bg-white d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary fw-bold">Đơn Hàng Mới Nhất</h6>
+                    <a href="/Order" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3">Mã ĐH</th>
+                                    <th>Khách hàng</th>
+                                    <th>Ngày đặt</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.RecentOrders != null)
+                                {
+                                    foreach (var order in ViewBag.RecentOrders)
+                                    {
+                                        <tr>
+                                            <td class="ps-3 fw-bold">#@order.Id</td>
+                                            <td>
+                                                @if(order.Customer != null)
+                                                {
+                                                    <div class="fw-bold">@order.Customer.FullName</div>
+                                                    <div class="small text-muted">@order.Customer.Phone</div>
+                                                }
+                                            </td>
+                                            <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>
+                                                @if (order.Status == 0)
+                                                {
+                                                    <span class="badge bg-warning text-dark">Chờ Xử Lý</span>
+                                                }
+                                                else if (order.Status == 1)
+                                                {
+                                                    <span class="badge bg-primary">Đang Giao</span>
+                                                }
+                                                else if (order.Status == 2)
+                                                {
+                                                    <span class="badge bg-success">Đã Hoàn Thành</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Đã Hủy</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">Chưa có đơn hàng nào.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

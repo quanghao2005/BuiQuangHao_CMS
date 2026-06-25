@@ -1,0 +1,76 @@
+@model IEnumerable<CMS.Data.Entities.Banner>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Quản lý Banner";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="text-dark fw-bold mb-0"><i class="bi bi-images"></i> QUẢN LÝ BANNER & SLIDER</h4>
+        <a href="/Banner/Create" class="btn btn-primary fw-bold">
+            <i class="bi bi-plus-circle"></i> Thêm Banner Mới
+        </a>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="text-center" style="width: 80px;">STT</th>
+                        <th class="text-center" style="width: 150px;">Hình Ảnh</th>
+                        <th>Tiêu Đề</th>
+                        <th>Link Đường Dẫn</th>
+                        <th class="text-center">Trạng Thái</th>
+                        <th class="text-center" style="width: 150px;">Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-center fw-bold">@item.DisplayOrder</td>
+                                <td class="text-center">
+                                    <img src="@item.ImageUrl" alt="Banner" class="img-fluid rounded border" style="max-height: 60px; object-fit: cover;" />
+                                </td>
+                                <td class="fw-bold">@item.Title</td>
+                                <td><a href="@item.Link" target="_blank" class="text-primary text-truncate d-inline-block" style="max-width:200px;">@item.Link</a></td>
+                                <td class="text-center">
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">Đang Hiện</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Đang Ẩn</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <a href="/Banner/Edit/@item.Id" class="btn btn-sm btn-warning text-dark fw-bold">
+                                            <i class="bi bi-pencil-square"></i> Sửa
+                                        </a>
+                                        <form action="/Banner/Delete/@item.Id" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa banner này?');" class="m-0">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-danger fw-bold">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">Chưa có banner nào. Hãy bấm thêm mới!</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

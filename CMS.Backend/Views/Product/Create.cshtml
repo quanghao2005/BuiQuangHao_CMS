@@ -1,0 +1,72 @@
+﻿@model CMS.Data.Entities.Product
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Thêm sản phẩm mới";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-box-seam-fill"></i> Thêm Sản Phẩm Mới</h5>
+        </div>
+        <div class="card-body">
+
+            @* QUAN TRỌNG: Đã thêm enctype="multipart/form-data" để hỗ trợ upload file *@
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-bold">Tên sản phẩm</label>
+                    <input asp-for="Name" class="form-control" placeholder="Nhập tên sản phẩm..." />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CategoryProductId" class="form-label fw-bold">Danh mục sản phẩm</label>
+                    <select asp-for="CategoryProductId" class="form-select" required>
+                        <option value="">-- Chọn danh mục sản phẩm --</option>
+                        @if (ViewBag.Categories != null)
+                        {
+                            foreach (var cat in ViewBag.Categories)
+                            {
+                                <option value="@cat.Id">@cat.Name</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="CategoryProductId" class="text-danger small"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Price" class="form-label fw-bold">Giá bán (VNĐ)</label>
+                        <input asp-for="Price" type="number" class="form-control" />
+                        <span asp-validation-for="Price" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="StockQuantity" class="form-label fw-bold">Số lượng kho</label>
+                        <input asp-for="StockQuantity" type="number" class="form-control" />
+                        <span asp-validation-for="StockQuantity" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                @* KHU VỰC THÊM HÌNH ẢNH SẢN PHẨM *@
+                <div class="mb-3 border p-3 bg-light rounded">
+                    <label class="form-label fw-bold text-primary"><i class="bi bi-image me-1"></i>Hình ảnh sản phẩm</label>
+                    <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                    <span class="text-muted small">Khuyên dùng ảnh tỷ lệ vuông, định dạng .jpg, .png hoặc .webp</span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-bold">Mô tả chi tiết</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Nhập thông tin về tròng kính, chất liệu gọng..."></textarea>
+                </div>
+
+                <div class="d-flex gap-2 justify-content-end mt-4 pt-3 border-top">
+                    <a asp-action="Index" class="btn btn-secondary px-4">Quay lại</a>
+                    <button type="submit" class="btn btn-success px-4"><i class="bi bi-save me-1"></i> Lưu Sản Phẩm</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
