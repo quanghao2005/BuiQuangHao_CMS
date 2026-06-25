@@ -1,3 +1,9 @@
+**👤 THÔNG TIN SINH VIÊN THỰC HIỆN**  
+**Họ và tên:** Bùi Quang Hào  
+**Mã số sinh viên (MSSV):** 2123110043  
+**Lớp:** CCQ2311B  
+**Năm thực hiện:** 2026  
+
 📂 BÁO CÁO TIẾN ĐỘ THỰC HÀNH - BUỔI 8 (SYNC & DATA BINDING)
 🛠 CÁC CÔNG VIỆC ĐÃ HOÀN THÀNH TRONG BUỔI 8
 1. Đồng bộ hóa kết nối API & Cấu hình môi trường
