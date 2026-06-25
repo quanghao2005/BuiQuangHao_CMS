@@ -1,27 +1,42 @@
-👤 THÔNG TIN SINH VIÊN THỰC HIỆN
-Họ và tên: Bùi Quang Hào
-Mã số sinh viên (MSSV): 2123110043
-Lớp: CCQ2311B
-Năm thực hiện: 2026
+**👤 THÔNG TIN SINH VIÊN THỰC HIỆN**  
+**Họ và tên:** Bùi Quang Hào  
+**Mã số sinh viên (MSSV):** 2123110043  
+**Lớp:** CCQ2311B  
+**Năm thực hiện:** 2026  
 
-# 🕶️ HaoCMS - DigitalGuard Store
-Hệ thống cửa hàng kinh doanh Kính Mắt thời trang và bảo vệ thị lực.
+# 🎨 HaoCMS Store - Frontend UI/UX
+Giao diện người dùng cho cửa hàng kính mắt HaoCMS. Được xây dựng dựa trên ReactJS kết hợp Bootstrap để mang lại trải nghiệm thương mại điện tử hiện đại và thân thiện.
 
-## 🚀 CẤU TRÚC DỰ ÁN 3 TẦNG (3-TIER ARCHITECTURE)
-Dự án được xây dựng chuẩn mực theo cấu trúc 3 phân tầng độc lập:
-- **CMS.Data:** Tầng thao tác và giao tiếp trực tiếp với cơ sở dữ liệu SQL Server (Entity Framework Core).
-- **CMS.Backend:** Tầng xử lý nghiệp vụ, giao tiếp API (ASP.NET Core Web API / MVC).
-- **CMS.Frontend:** Tầng hiển thị giao diện người dùng và trải nghiệm khách hàng (ReactJS).
+## 🌟 NHỮNG NÂNG CẤP GIAO DIỆN & TÍNH NĂNG (GẦN ĐÂY)
+Trong các bản cập nhật mới nhất, hệ thống đã được trang bị hàng loạt tính năng cao cấp của các sàn TMĐT chuyên nghiệp:
 
-## 🛠️ HƯỚNG DẪN CÀI ĐẶT VÀ CHẠY DỰ ÁN
+### 1. Trải nghiệm tìm kiếm thông minh (Live Search)
+- Xây dựng component `SearchBar.jsx` hoàn toàn mới.
+- Khách hàng chỉ cần gõ từ khóa, hệ thống sẽ **gợi ý thả xuống (Dropdown)** ngay lập tức với hình ảnh và giá tiền sản phẩm mà không cần tải lại trang.
 
-### 1. Khởi động Backend (API & Admin)
-1. Mở file Solution `CMS.Backend.sln` bằng **Visual Studio**.
-2. Chọn project khởi chạy là `CMS.Backend`.
-3. Bấm nút **Run (F5)** hoặc biểu tượng Tam giác màu xanh lá cây.
-4. Hệ thống sẽ tự động build và mở trang web Swagger API hoặc giao diện Admin. Đảm bảo Backend luôn chạy ngầm để Frontend có thể lấy dữ liệu.
+### 2. Quy trình Mua Hàng & Thanh Toán (Checkout) cực mượt
+- Nút **"Mua Ngay"** tự động chuyển hướng khách hàng bay thẳng vào trang Thanh toán để chốt đơn nhanh nhất.
+- Bổ sung **Hình ảnh sản phẩm** trực quan ngay tại trang Checkout.
+- **Auto-fill (Tự động điền):** Tự động nhận diện và điền sẵn Họ tên, SĐT, Địa chỉ của khách hàng vào Form đặt hàng nếu đã đăng nhập.
+- **Bảo mật:** Bắt buộc khách hàng phải đăng nhập mới được thêm vào giỏ hàng hoặc truy cập Checkout. Khách lạ sẽ bị đẩy về trang Login.
 
-### 2. Khởi động Frontend (ReactJS)
-1. Mở Terminal / Command Prompt và di chuyển vào thư mục frontend:
-   ```bash
-   cd cms.frontend
+### 3. Trang Hồ Sơ (Profile) mang phong cách Card Dashboard
+- Thiết kế lại trang thông tin người dùng theo phong cách giao diện Dashboard cực kỳ "nịnh mắt".
+- Tách biệt rõ ràng khu vực Thông tin chung (Bên trái) và khu vực Cập nhật dữ liệu, Đổi mật khẩu (Bên phải).
+
+### 4. Lịch Sử Mua Hàng (Order History)
+- Khách hàng có thể tự theo dõi lại toàn bộ các đơn hàng mình đã từng mua.
+- Hiển thị đầy đủ tổng tiền, trạng thái giao hàng và chi tiết các sản phẩm bên trong đơn.
+
+### 5. Tinh chỉnh Layout & Nội dung
+- **Thanh Điều Hướng (Top Navbar):** Được làm gọn gàng, dính chặt trên đỉnh (Sticky Top) và mượt mà hơn.
+- **Phân trang sản phẩm:** Chốt cố định lưới (grid) 9 sản phẩm/trang để giao diện luôn vuông vức 3x3. Thanh phân trang luôn hiển thị để điều hướng tốt hơn.
+- **Tin tức & Blog:** Trích xuất tự động và làm sạch đoạn mã HTML để biến thành các mô tả ngắn (excerpt) tuyệt đẹp trong danh sách bài viết.
+
+## 🛠️ HƯỚNG DẪN KHỞI CHẠY (NPM)
+```bash
+# Cài đặt thư viện node_modules
+npm install
+
+# Khởi chạy máy chủ React
+npm start
