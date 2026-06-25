@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using CMS.Data;
@@ -20,7 +20,11 @@ namespace CMS.Backend.Controllers
         // 1. DANH SÁCH ĐƠN HÀNG
         public IActionResult Index()
         {
-            var orders = _context.Orders.Include(o => o.Customer).OrderByDescending(o => o.Id).ToList();
+            var orders = _context.Orders
+                .Include(o => o.Customer)
+                .Include(o => o.OrderDetails) // Thêm dòng này để Load chi tiết và tính được Tổng Tiền
+                .OrderByDescending(o => o.Id)
+                .ToList();
             return View(orders);
         }
 

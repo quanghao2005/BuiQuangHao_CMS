@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, useLocation, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import bannerImg from './assets/images/banner.jpg';
 
 // Import các components
 import CategoryProductList from './components/CategoryProductList';
@@ -10,6 +9,8 @@ import PriceFilter from './components/PriceFilter';
 import ProductList from './components/ProductList';
 import PostList from './components/PostList';
 import HotProductList from './components/HotProductList';
+import BannerCarousel from './components/BannerCarousel';
+import SearchBar from './components/SearchBar';
 
 import BlogCategoryList from './components/BlogCategoryList';
 import PostDetail from './components/PostDetail';
@@ -22,52 +23,15 @@ import Login from './components/Login';
 import Register from './components/Register';
 import ForgotPassword from './components/ForgotPassword';
 import Profile from './components/Profile';
+import OrderHistory from './components/OrderHistory';
 import Checkout from './components/Checkout';
 import { CartProvider, useCart } from './context/CartContext';
 
-// Tách phần Header ra component riêng để dùng useCart (vì useCart phải nằm trong CartProvider)
-const Header = () => {
-    const { cartCount } = useCart();
-    const [searchKeyword, setSearchKeyword] = useState('');
-    
-    const handleSearch = (e) => {
-        e.preventDefault();
-        if (searchKeyword.trim()) {
-            window.location.href = `/products?search=${encodeURIComponent(searchKeyword)}`;
-        }
-    };
-
-    return (
-        <header className="glass-header d-flex align-items-center justify-content-between p-4 flex-wrap gap-3">
-            <Link to="/" className="brand-font fs-3 fw-bold text-gradient text-decoration-none">
-                <i className="fa-solid fa-glasses me-2"></i>HaoCMS.DigitalGuard
-            </Link>
-            
-            <form onSubmit={handleSearch} className="d-flex flex-grow-1 mx-lg-5" style={{ maxWidth: '500px' }}>
-                <input 
-                    type="text" 
-                    className="form-control me-2" 
-                    placeholder="Tìm kiếm sản phẩm..." 
-                    value={searchKeyword}
-                    onChange={(e) => setSearchKeyword(e.target.value)}
-                />
-                <button type="submit" className="btn btn-primary"><i className="fa-solid fa-magnifying-glass"></i></button>
-            </form>
-
-            <Link to="/cart" className="btn btn-light border fw-bold position-relative">
-                🛒 GIỎ HÀNG
-                {cartCount > 0 && (
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        {cartCount}
-                    </span>
-                )}
-            </Link>
-        </header>
-    );
-};
+// Xóa bỏ component Header cũ vì đã gộp chung vào App
 
 function App() {
     const location = useLocation();
+    const { cartCount } = useCart();
     const [categories, setCategories] = useState([]);
 
     useEffect(() => {
@@ -83,7 +47,7 @@ function App() {
     }, []);
 
     const isHomePage = location.pathname === '/';
-    const isUtilityPage = ['/about', '/contact', '/cart', '/login', '/register', '/forgot-password', '/profile', '/checkout'].includes(location.pathname);
+    const isUtilityPage = ['/about', '/contact', '/cart', '/login', '/register', '/forgot-password', '/profile', '/order-history', '/checkout'].includes(location.pathname);
     const isBlogPage = location.pathname.startsWith('/blog') || location.pathname.startsWith('/post');
     const isProductPage = !isUtilityPage && !isBlogPage;
 
@@ -96,55 +60,82 @@ function App() {
 
     return (
         <div className="main-container container my-4 p-0 fade-in-up">
-            {/* 1. HEADER & TOP BAR */}
-            <div className="bg-dark text-white py-1 px-3 d-flex justify-content-end align-items-center" style={{ fontSize: '12px' }}>
-                <Link to="/" className="text-white text-decoration-none me-4"><i className="fa-solid fa-house me-1"></i> TRANG CHỦ</Link>
-                {customer ? (
-                    <>
-                        <Link to="/profile" className="text-white text-decoration-none me-3"><i className="fa-solid fa-user me-1"></i> Xin chào, <b>{customer.fullName || customer.FullName}</b></Link>
-                        <span style={{ cursor: 'pointer', color: '#ff6b6b' }} onClick={handleLogout}><i className="fa-solid fa-right-from-bracket me-1"></i> Đăng xuất</span>
-                    </>
-                ) : (
-                    <Link to="/login" className="text-white text-decoration-none"><i className="fa-solid fa-user me-1"></i> Đăng nhập</Link>
-                )}
+            {/* 1. TOP BAR */}
+            <div className="bg-dark text-white py-2 px-4 d-flex justify-content-between align-items-center" style={{ fontSize: '13px' }}>
+                <div className="d-none d-md-block">
+                    <i className="fa-solid fa-envelope me-2 text-primary"></i> support@haocms.com 
+                    <span className="mx-3 text-secondary">|</span> 
+                    <i className="fa-solid fa-phone me-2 text-primary"></i> Hotline: 1800-1234
+                </div>
+                <div className="ms-auto">
+                    {customer ? (
+                        <>
+                            <Link to="/profile" className="text-white text-decoration-none me-4 hover-opacity">
+                                <i className="fa-solid fa-user-circle me-1 text-primary"></i> Xin chào, <b className="text-warning">{customer.fullName || customer.FullName}</b>
+                            </Link>
+                            <span style={{ cursor: 'pointer', transition: 'color 0.3s' }} className="text-danger fw-bold hover-opacity" onClick={handleLogout}>
+                                <i className="fa-solid fa-right-from-bracket me-1"></i> Đăng xuất
+                            </span>
+                        </>
+                    ) : (
+                        <Link to="/login" className="text-white text-decoration-none hover-opacity fw-bold">
+                            <i className="fa-solid fa-user me-2 text-primary"></i> Đăng nhập / Đăng ký
+                        </Link>
+                    )}
+                </div>
             </div>
             
-            <Header />
+            {/* 2. MAIN NAVBAR */}
+            <nav className="navbar navbar-expand-lg bg-white shadow-sm py-3 px-4 sticky-top" style={{ zIndex: 1000, borderRadius: '0 0 16px 16px' }}>
+                <div className="container-fluid align-items-center">
+                    {/* Logo */}
+                    <Link to="/" className="navbar-brand brand-font fs-3 fw-bold text-gradient me-5">
+                        <i className="fa-solid fa-glasses me-2"></i>HaoCMS<span className="text-dark">.Store</span>
+                    </Link>
+                    
+                    {/* Nút hamburger cho Mobile */}
+                    <button className="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-toggle="target" aria-expanded="false" aria-label="Toggle navigation">
+                        <span className="navbar-toggler-icon"></span>
+                    </button>
 
-            {/* 2. THANH NAVBAR ĐIỀU HƯỚNG MỚI */}
-            <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3 px-4" style={{ borderRadius: '0 0 16px 16px' }}>
-                <div className="container-fluid">
-                    <ul className="navbar-nav d-flex flex-row w-100 justify-content-center">
-                        <li className="nav-item mx-3">
-                            <Link to="/" className="nav-link fw-bold text-dark text-uppercase">TRANG CHỦ</Link>
-                        </li>
-                        <li className="nav-item mx-3">
-                            <Link to="/products" className="nav-link fw-bold text-dark text-uppercase">SẢN PHẨM</Link>
-                        </li>
-                        <li className="nav-item mx-3">
-                            <Link to="/blog" className="nav-link fw-bold text-dark text-uppercase">TIN TỨC</Link>
-                        </li>
-                        <li className="nav-item mx-3">
-                            <Link to="/contact" className="nav-link fw-bold text-dark text-uppercase">LIÊN HỆ</Link>
-                        </li>
-                    </ul>
+                    {/* Menu Links */}
+                    <div className="collapse navbar-collapse justify-content-center">
+                        <ul className="navbar-nav gap-2 gap-lg-4">
+                            <li className="nav-item">
+                                <Link to="/" className="nav-link fw-bold text-dark text-uppercase hover-primary">TRANG CHỦ</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link to="/products" className="nav-link fw-bold text-dark text-uppercase hover-primary">SẢN PHẨM</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link to="/blog" className="nav-link fw-bold text-dark text-uppercase hover-primary">TIN TỨC</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link to="/contact" className="nav-link fw-bold text-dark text-uppercase hover-primary">LIÊN HỆ</Link>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Search & Cart */}
+                    <div className="d-flex align-items-center gap-3 mt-3 mt-lg-0 ms-lg-auto">
+                        <SearchBar />
+
+                        <Link to="/cart" className="btn btn-primary rounded-pill fw-bold position-relative px-4 shadow-sm border-0 d-flex align-items-center gap-2">
+                            <i className="fa-solid fa-cart-shopping"></i> Giỏ Hàng
+                            {cartCount > 0 && (
+                                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white border-2" style={{ fontSize: '11px' }}>
+                                    {cartCount}
+                                </span>
+                            )}
+                        </Link>
+                    </div>
                 </div>
             </nav>
 
             {/* 3. CONTENT */}
             <div className="p-4 mt-3">
                 {!isUtilityPage && (
-                    <div className="fade-in-up delay-100">
-                        <div className="mb-5 position-relative overflow-hidden" style={{ borderRadius: '24px', boxShadow: 'var(--shadow-md)' }}>
-                            <img src={bannerImg} alt="Banner" className="img-fluid w-100" style={{ maxHeight: '400px', objectFit: 'cover' }} />
-                            <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.6), transparent)' }}></div>
-                            <div className="position-absolute top-50 start-0 translate-middle-y text-white p-5">
-                                <h1 className="brand-font fw-bold mb-3 display-4">Kính mắt <span className="text-gradient" style={{background: 'linear-gradient(135deg, #60a5fa, #c084fc)', WebkitBackgroundClip: 'text'}}>Công Nghệ</span></h1>
-                                <p className="fs-5 mb-4" style={{maxWidth: '400px'}}>Bảo vệ thị lực toàn diện trước ánh sáng xanh. Thiết kế thời thượng, chất lượng vượt trội.</p>
-                                <Link to="/products" className="btn btn-primary btn-lg px-4 rounded-pill">Khám phá ngay <i className="fa-solid fa-arrow-right ms-2"></i></Link>
-                            </div>
-                        </div>
-                    </div>
+                    <BannerCarousel />
                 )}
 
                 {isHomePage && (
@@ -198,6 +189,7 @@ function App() {
                             <Route path="/register" element={<Register />} />
                             <Route path="/forgot-password" element={<ForgotPassword />} />
                             <Route path="/profile" element={<Profile />} />
+                            <Route path="/order-history" element={<OrderHistory />} />
                         </Routes>
                     </div>
                 </div>

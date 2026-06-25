@@ -121,7 +121,7 @@ const ProductDetail = () => {
                             className="btn btn-danger btn-lg flex-grow-1 fw-bold"
                             onClick={() => {
                                 addToCart(product, quantity);
-                                navigate('/cart');
+                                navigate('/checkout');
                             }}
                         >
                             MUA NGAY

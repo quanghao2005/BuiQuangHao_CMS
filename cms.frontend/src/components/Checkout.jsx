@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import axiosClient from '../api/axiosClient';
 
 const Checkout = () => {
-    const { cartItems, cartTotal, clearCart } = useCart();
+    const { cartItems, cartTotal, clearCart, updateQuantity, removeFromCart } = useCart();
     const navigate = useNavigate();
     
     const [formData, setFormData] = useState({
@@ -16,6 +16,27 @@ const Checkout = () => {
     });
     
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const customer = localStorage.getItem('customer');
+        if (!customer) {
+            alert('Bạn cần đăng nhập để tiến hành thanh toán!');
+            navigate('/login');
+        } else {
+            try {
+                const parsedCustomer = JSON.parse(customer);
+                setFormData(prev => ({
+                    ...prev,
+                    fullName: parsedCustomer.fullName || parsedCustomer.FullName || '',
+                    email: parsedCustomer.email || parsedCustomer.Email || '',
+                    phone: parsedCustomer.phone || parsedCustomer.Phone || '',
+                    address: parsedCustomer.address || parsedCustomer.Address || ''
+                }));
+            } catch (e) {
+                console.error("Lỗi parse customer data:", e);
+            }
+        }
+    }, [navigate]);
 
     if (cartItems.length === 0) {
         return (
@@ -104,11 +125,30 @@ const Checkout = () => {
                         <div className="card-body">
                             <h5 className="fw-bold mb-3 border-bottom pb-2">ĐƠN HÀNG CỦA BẠN</h5>
                             {cartItems.map((item, index) => (
-                                <div key={index} className="d-flex justify-content-between mb-2 small">
-                                    <span className="text-truncate" style={{maxWidth: '60%'}}>
-                                        {item.quantity} x {item.name}
-                                    </span>
-                                    <span className="fw-bold">{(item.price * item.quantity).toLocaleString('vi-VN')} ₫</span>
+                                <div key={index} className="d-flex align-items-center mb-3 small border-bottom pb-3">
+                                    <div className="flex-shrink-0 me-3">
+                                        <img 
+                                            src={item.imageUrl ? `https://localhost:7271${item.imageUrl}` : '/images/default-product.jpg'} 
+                                            alt={item.name}
+                                            className="rounded border object-fit-cover shadow-sm bg-white p-1"
+                                            style={{ width: '65px', height: '65px' }}
+                                            onError={(e) => { e.target.src = '/images/default-product.jpg'; }}
+                                        />
+                                    </div>
+                                    <div className="flex-grow-1 pe-2">
+                                        <div className="fw-bold text-dark text-wrap mb-2" style={{ lineHeight: '1.4' }}>{item.name}</div>
+                                        <div className="input-group input-group-sm" style={{ width: '90px' }}>
+                                            <button type="button" className="btn btn-outline-secondary px-2" onClick={() => updateQuantity(item.id, item.quantity - 1, item.stockQuantity || 999)}>-</button>
+                                            <input type="text" className="form-control text-center px-0 bg-white" value={item.quantity} readOnly />
+                                            <button type="button" className="btn btn-outline-secondary px-2" onClick={() => updateQuantity(item.id, item.quantity + 1, item.stockQuantity || 999)}>+</button>
+                                        </div>
+                                    </div>
+                                    <div className="text-end flex-shrink-0">
+                                        <div className="fw-bold text-danger fs-6 mb-2">{(item.price * item.quantity).toLocaleString('vi-VN')} ₫</div>
+                                        <button type="button" className="btn btn-sm btn-outline-danger py-0 px-2" onClick={() => removeFromCart(item.id)}>
+                                            <i className="fa-solid fa-trash-can me-1"></i>Xóa
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                             <hr />

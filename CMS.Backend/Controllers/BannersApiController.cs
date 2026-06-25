@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CMS.Backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Banners")]
     [ApiController]
     public class BannersApiController : ControllerBase
     {

@@ -15,6 +15,13 @@ export const CartProvider = ({ children }) => {
     }, [cartItems]);
 
     const addToCart = (product, quantity = 1) => {
+        const customer = localStorage.getItem('customer');
+        if (!customer) {
+            alert('Bạn cần đăng nhập để có thể mua hàng!');
+            window.location.href = '/login';
+            return;
+        }
+
         if (!product || product.stockQuantity < quantity) {
             alert('Số lượng sản phẩm trong kho không đủ!');
             return;

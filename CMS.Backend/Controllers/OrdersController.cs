@@ -109,6 +109,40 @@ namespace CMS.Backend.Controllers
                 }
             }
         }
+
+        [HttpGet("History/{customerId}")]
+        public async Task<IActionResult> GetHistory(int customerId)
+        {
+            try
+            {
+                var orders = await _context.Orders
+                    .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Product)
+                    .Where(o => o.CustomerId == customerId)
+                    .OrderByDescending(o => o.OrderDate)
+                    .Select(o => new {
+                        Id = o.Id,
+                        OrderDate = o.OrderDate,
+                        Status = o.Status,
+                        Notes = o.Notes,
+                        TotalAmount = o.OrderDetails.Sum(od => od.Quantity * od.UnitPrice),
+                        Details = o.OrderDetails.Select(od => new {
+                            ProductId = od.ProductId,
+                            ProductName = od.Product.Name,
+                            ProductImage = od.Product.ImageUrl,
+                            Quantity = od.Quantity,
+                            UnitPrice = od.UnitPrice
+                        }).ToList()
+                    })
+                    .ToListAsync();
+
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi truy xuất lịch sử đơn hàng", detail = ex.Message });
+            }
+        }
     }
 
     public class CheckoutRequestDTO

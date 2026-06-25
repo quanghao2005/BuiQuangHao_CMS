@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom'; // Thêm useParams
 import blogService from '../services/blogService';
 
@@ -74,7 +74,7 @@ const PostList = () => {
                         <div className="ms-3 flex-grow-1">
                             <h6 className="fw-bold mb-1 text-dark" style={{ lineHeight: '1.4' }}>{item.title}</h6>
                             <p className="small text-muted mb-2 text-truncate" style={{ maxWidth: '400px' }}>
-                                {item.shortDescription || 'Đang cập nhật nội dung...'}
+                                {item.shortDescription || (item.content ? item.content.replace(/<[^>]+>/g, '') : 'Đang cập nhật nội dung...')}
                             </p>
                             <div className="d-flex align-items-center">
                                 <span className="badge bg-danger me-2">Kiến thức</span>

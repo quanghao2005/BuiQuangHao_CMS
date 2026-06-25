@@ -16,7 +16,6 @@ const ProductList = () => {
                 setLoading(true);
                 let response;
                 const searchKeyword = searchParams.get('search') || '';
-
                 if (categoryId) {
                     response = await productService.getProductsByCategory(categoryId, page, 9);
                 } else {
@@ -128,7 +127,7 @@ const ProductList = () => {
             )}
 
             {/* Pagination */}
-            {totalPages > 1 && filteredProducts.length > 0 && (
+            {totalPages > 0 && filteredProducts.length > 0 && (
                 <div className="d-flex justify-content-center mt-5">
                     <nav>
                         <ul className="pagination">

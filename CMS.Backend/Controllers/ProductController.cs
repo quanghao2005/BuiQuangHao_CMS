@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Họ Tên : Bùi Quang Hào
  * MSSV : 2123110043
  */
@@ -26,10 +26,22 @@ namespace CMS.Backend.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        // 1. Hiển thị danh sách sản phẩm
-        public IActionResult Index()
+        // 1. Hiển thị danh sách sản phẩm (có phân trang)
+        public IActionResult Index(int page = 1)
         {
-            var data = _context.Products.ToList();
+            int pageSize = 5;
+            var query = _context.Products.AsQueryable();
+            int totalItems = query.Count();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            
+            var data = query.OrderByDescending(x => x.Id)
+                            .Skip((page - 1) * pageSize)
+                            .Take(pageSize)
+                            .ToList();
+                            
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            
             return View(data);
         }
 
