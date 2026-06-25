@@ -31,20 +31,18 @@ namespace CMS.Backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            // Lấy toàn bộ dữ liệu từ bảng Posts trong SQL Server
             var posts = await _context.Posts
-                .Include(p => p.Category)       // Nạp chồng (Join) bảng Category để lấy tên danh mục
-                .OrderByDescending(p => p.Id)   // Sắp xếp bài viết mới nhất lên đầu trang
-                .Select(p => new {              // "Gọt tỉa" dữ liệu: Chỉ bóc tách những trường cần thiết
+                .Include(p => p.Category)
+                .OrderByDescending(p => p.Id)
+                .Select(p => new {
                     p.Id,
                     p.Title,
                     p.ImageUrl,
                     p.CreatedDate,
-                    CategoryName = p.Category.Name // Kéo trực tiếp tên chuyên mục thay vì lấy mã ID cộc lốc
+                    CategoryName = p.Category.Name
                 })
-                .ToListAsync(); // Chốt chặn bất đồng bộ để tải dữ liệu về mảng sạch
+                .ToListAsync();
 
-            // Trả về mảng dữ liệu JSON cho Frontend kèm mã trạng thái HTTP 200 OK
             return Ok(posts);
         }
 
@@ -54,7 +52,6 @@ namespace CMS.Backend.Controllers
         [HttpGet("category/{categoryId}")]
         public async Task<IActionResult> GetByCategory(int categoryId)
         {
-            // Lọc các bài viết có CategoryId trùng với ID truyền vào từ thanh URL
             var posts = await _context.Posts
                 .Where(p => p.CategoryId == categoryId)
                 .OrderByDescending(p => p.CreatedDate)
@@ -66,31 +63,35 @@ namespace CMS.Backend.Controllers
                 })
                 .ToListAsync();
 
-            // Trả về kết quả JSON sạch kèm trạng thái HTTP 200 OK
             return Ok(posts);
         }
 
         // ====================================================================================
-        // PHẦN 3: API CHI TIẾT BÀI VIẾT (GET BY ID - ASYNC/AWAIT)
+        // PHẦN 3: API CHI TIẾT BÀI VIẾT (ĐÃ FIX LỖI VÒNG LẶP JSON CIRCULAR REFERENCE)
         // ====================================================================================
-
-        // 3. Định nghĩa đường dẫn nhận ID trực tiếp: api/posts/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDetail(int id)
         {
-            // 3.1. Quét bảng Posts để tìm bài viết đầu tiên có Id khớp với tham số
+            // Sử dụng Select để chỉ bốc tách những thông tin cần thiết, 
+            // KHÔNG trả về nguyên entity gốc để tránh bị vòng lặp JSON
             var post = await _context.Posts
-                .Include(p => p.Category) // Lấy kèm thông tin danh mục nếu cần hiển thị ngoài UI
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .Where(p => p.Id == id)
+                .Select(p => new {
+                    p.Id,
+                    p.Title,
+                    p.Content, // Quan trọng: Đây là đoạn HTML nội dung bài viết
+                    p.ImageUrl,
+                    p.CreatedDate,
+                    CategoryId = p.CategoryId,
+                    CategoryName = p.Category != null ? p.Category.Name : "Chưa phân loại"
+                })
+                .FirstOrDefaultAsync();
 
-            // 3.2 Xử lý kịch bản lỗi bảo vệ hệ thống: ID không tồn tại trong Database
             if (post == null)
             {
-                // Trả về mã lỗi 404 kèm một "gói tin" JSON thông báo nhỏ gọn để Frontend tự xử lý UI
                 return NotFound(new { message = "Không tìm thấy bài viết này trong hệ thống" });
             }
 
-            // 3.3. Trả về toàn bộ đối tượng bài viết (bao gồm cả trường Content chứa mã HTML) kèm mã 200 OK
             return Ok(post);
         }
     }

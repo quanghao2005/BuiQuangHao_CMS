@@ -1,20 +1,22 @@
 ﻿import axiosClient from '../api/axiosClient';
 
 const blogService = {
-    // Lấy danh sách bài viết (Khớp với /api/Posts trong Swagger)
+    // Lấy danh sách bài viết 
     getAllPosts: () => {
         return axiosClient.get('/Posts');
     },
-
-    // Lấy chi tiết bài viết (Khớp với /api/Posts/{id} trong Swagger)
+    getPostsByCategory: (categoryId) => {
+        // Lưu ý: Đảm bảo Backend C# của bạn có API bắt Route này
+        return axiosClient.get(`/Posts/Category/${categoryId}`);
+    },
+    // Lấy chi tiết bài viết 
     getPostById: (id) => {
         return axiosClient.get(`/Posts/${id}`);
     },
 
-    // Lưu ý: Hiện tại Swagger chưa có /api/Categories
-    // Nếu bạn muốn lấy danh mục, hãy tạo Controller tương ứng ở Backend
+    // Đã đổi tên hàm thành getBlogCategories để khớp 100% với BlogCategoryList.jsx
     getBlogCategories: () => {
-        // Sau khi tạo Controller ở Backend và nó hiện trong Swagger, hãy thay URL vào đây
+        // Lưu ý: Khi nào Backend có API này, đảm bảo Route trên C# là /api/Categories
         return axiosClient.get('/Categories');
     }
 };

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Sinh viên: Bùi Quang Hào
  * MSSV: 2123110043
  */
@@ -20,13 +20,14 @@ builder.Services.AddControllersWithViews();
 // --- CẤU HÌNH CORS CHO REACTJS ---
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000") // Cho phép ReactJS ở port 3000
-              .AllowAnyHeader()                     // Cho phép mọi Header
-              .AllowAnyMethod()                     // Cho phép mọi phương thức HTTP
-              .AllowCredentials();                  // Hỗ trợ truyền Cookie/Session
-    });
+    options.AddPolicy("AllowReactApp",
+        builder =>
+        {
+            builder.SetIsOriginAllowed(origin => true) // Cho phép tất cả các cổng (3000, 3001, 3002...)
+                   .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowCredentials(); // Hỗ trợ gửi cookie/token nếu cần
+        });
 });
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -65,19 +66,12 @@ app.UseStaticFiles();
 
 app.UseRouting(); // Bắt đầu nhận diện phân luồng tuyến đường
 
-// --- [VỊ TRÍ ĐẶT CORS CHUẨN]: Phải nằm ngay giữa UseRouting và UseAuthentication ---
-app.UseCors("AllowAll");
+// --- KÍCH HOẠT CORS ĐÚNG VỊ TRÍ ---
+app.UseCors("AllowReactApp");
 
 // --- BUỔI 5: KÍCH HOẠT XÁC THỰC VÀ PHÂN QUYỀN COOKIE ---
 app.UseAuthentication(); // Bước A: Xác nhận "Anh là ai?"
 app.UseAuthorization();  // Bước B: Xác nhận "Anh được làm gì?"
-
-
-// --- KÍCH HOẠT CORS ĐÚNG VỊ TRÍ ---
-app.UseCors("AllowReactApp");
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 // =================================================================
 // 3. KHU VỰC ĐỊNH TUYẾN PHÂN LUỒNG (ROUTING MAP)

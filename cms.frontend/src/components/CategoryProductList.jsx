@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // Thêm import này
 import categoryProductService from '../services/categoryProductService';
 
 const CategoryProductList = () => {
@@ -10,7 +11,6 @@ const CategoryProductList = () => {
             try {
                 setLoading(true);
                 const data = await categoryProductService.getAllCategoryProducts();
-                // Đảm bảo dữ liệu là mảng trước khi set vào state
                 setCategoryProducts(Array.isArray(data) ? data : []);
             } catch (error) {
                 console.error("Lỗi khi tải danh mục sản phẩm:", error);
@@ -23,30 +23,34 @@ const CategoryProductList = () => {
     }, []);
 
     if (loading) {
-        return <div className="text-center my-4"><div className="spinner-border text-primary" role="status"></div></div>;
+        return (
+            <div className="text-center py-3">
+                <div className="spinner-border text-primary spinner-border-sm" role="status"></div>
+                <span className="ms-2 text-muted small">Đang nạp danh mục...</span>
+            </div>
+        );
     }
 
     return (
-        <div className="card shadow-sm border-0">
-            <div className="card-header bg-white py-3">
-                <h5 className="card-title text-uppercase font-weight-bold mb-0">
-                    <i className="fa-solid fa-list text-primary me-2"></i> Danh mục SP
-                </h5>
-            </div>
-            <div className="list-group list-group-flush">
+        <div className="card shadow-sm p-3 bg-white rounded border">
+            <h6 className="card-title text-uppercase fw-bold text-dark mb-3 border-bottom pb-2">
+                <i className="fa-solid fa-layer-group me-2 text-primary"></i> Lọc Theo Danh Mục Kính
+            </h6>
+
+            <div className="d-flex flex-wrap gap-2">
                 {categoryProducts.length > 0 ? (
                     categoryProducts.map((item) => (
-                        <button
+                        <Link // Đổi thẻ <a> thành <Link>
                             key={item.id}
-                            type="button"
-                            className="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3"
+                            to={`/category/${item.id}`} // Đổi href thành to
+                            className="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1"
+                            style={{ fontSize: '13px', transition: 'all 0.2s' }}
                         >
                             {item.name}
-                            <i className="fa-solid fa-angle-right text-muted"></i>
-                        </button>
+                        </Link>
                     ))
                 ) : (
-                    <div className="p-3 text-center text-muted">Không có danh mục nào.</div>
+                    <div className="py-2 text-muted small">Không có danh mục nào.</div>
                 )}
             </div>
         </div>

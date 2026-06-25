@@ -1,10 +1,16 @@
-﻿// Họ Tên: Bùi Quang Hào
-// MSSV: 2123110043
+﻿/*
+ * Họ Tên : Bùi Quang Hào
+ * MSSV : 2123110043
+ */
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using CMS.Data;
 using CMS.Data.Entities;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using System;
 
 namespace CMS.Backend.Controllers
 {
@@ -12,10 +18,12 @@ namespace CMS.Backend.Controllers
     public class ProductController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductController(ApplicationDbContext context)
+        public ProductController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // 1. Hiển thị danh sách sản phẩm
@@ -29,35 +37,44 @@ namespace CMS.Backend.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            // Lấy danh sách danh mục truyền sang View để làm ô chọn Dropdown
             ViewBag.Categories = _context.CategoryProducts.ToList();
             return View();
         }
 
-        // 3. POST: Thực thi Lưu Sản Phẩm
+        // 3. POST: Thực thi Lưu Sản Phẩm (Đã xử lý Upload ảnh)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Product model)
+        public IActionResult Create(Product model, IFormFile? imageFile)
         {
-            ModelState.Remove("Id"); // Bỏ qua kiểm tra Id tự tăng của Entity
+            ModelState.Remove("Id");
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Xử lý lưu ảnh
+                    if (imageFile != null && imageFile.Length > 0)
+                    {
+                        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                        string uploadPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "products");
+                        if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+
+                        using (var fileStream = new FileStream(Path.Combine(uploadPath, fileName), FileMode.Create))
+                        {
+                            imageFile.CopyTo(fileStream);
+                        }
+                        model.ImageUrl = "/images/products/" + fileName;
+                    }
+
                     _context.Products.Add(model);
                     _context.SaveChanges();
                     return RedirectToAction("Index");
                 }
                 catch (System.Exception ex)
                 {
-                    // Lấy thông tin lỗi sâu nhất từ SQL Server (InnerException) nếu có
-                    var errorMsg = ex.InnerException?.Message ?? ex.Message;
-                    ModelState.AddModelError("", "Lỗi lưu SQL: " + errorMsg);
+                    ModelState.AddModelError("", "Lỗi lưu SQL: " + ex.Message);
                 }
             }
-
-            // Nếu dữ liệu không hợp lệ hoặc lỗi SQL, nạp lại danh mục trước khi trả về View
             ViewBag.Categories = _context.CategoryProducts.ToList();
             return View(model);
         }
@@ -69,37 +86,48 @@ namespace CMS.Backend.Controllers
             var product = _context.Products.Find(id);
             if (product == null) return NotFound();
 
-            // Nạp danh sách danh mục để form Sửa cũng chọn lại được danh mục
             ViewBag.Categories = _context.CategoryProducts.ToList();
             return View(product);
         }
 
-        // 5. POST: Thực thi Cập Nhật Sản Phẩm
+        // 5. POST: Thực thi Cập Nhật Sản Phẩm (Đã xử lý Upload ảnh)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Product model)
+        public IActionResult Edit(Product model, IFormFile? imageFile)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Xử lý ảnh nếu người dùng chọn ảnh mới
+                    if (imageFile != null && imageFile.Length > 0)
+                    {
+                        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                        string uploadPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "products");
+                        if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+
+                        using (var fileStream = new FileStream(Path.Combine(uploadPath, fileName), FileMode.Create))
+                        {
+                            imageFile.CopyTo(fileStream);
+                        }
+                        model.ImageUrl = "/images/products/" + fileName;
+                    }
+                    // Nếu imageFile null, model.ImageUrl vẫn giữ giá trị cũ (được gửi từ thẻ hidden trong View)
+
                     _context.Products.Update(model);
                     _context.SaveChanges();
                     return RedirectToAction("Index");
                 }
                 catch (System.Exception ex)
                 {
-                    var errorMsg = ex.InnerException?.Message ?? ex.Message;
-                    ModelState.AddModelError("", "Lỗi cập nhật SQL: " + errorMsg);
+                    ModelState.AddModelError("", "Lỗi cập nhật SQL: " + ex.Message);
                 }
             }
-
-            // Nạp lại danh sách danh mục nếu xảy ra lỗi validate
             ViewBag.Categories = _context.CategoryProducts.ToList();
             return View(model);
         }
 
-        // 6. POST: Thực thi Xóa Sản Phẩm
+        // 6. POST: Xóa
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)

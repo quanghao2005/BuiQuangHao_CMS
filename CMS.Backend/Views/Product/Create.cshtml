@@ -10,7 +10,9 @@
             <h5 class="mb-0"><i class="bi bi-box-seam-fill"></i> Thêm Sản Phẩm Mới</h5>
         </div>
         <div class="card-body">
-            <form asp-action="Create" method="post">
+
+            @* QUAN TRỌNG: Đã thêm enctype="multipart/form-data" để hỗ trợ upload file *@
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                 <div class="mb-3">
@@ -19,7 +21,6 @@
                     <span asp-validation-for="Name" class="text-danger small"></span>
                 </div>
 
-                @* SỬA TÊN THUỘC TÍNH TỪ CategoryId THÀNH CategoryProductId KHỚP VỚI ENTITY *@
                 <div class="mb-3">
                     <label asp-for="CategoryProductId" class="form-label fw-bold">Danh mục sản phẩm</label>
                     <select asp-for="CategoryProductId" class="form-select" required>
@@ -48,16 +49,24 @@
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Description" class="form-label fw-bold">Mô tả sản phẩm</label>
-                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                @* KHU VỰC THÊM HÌNH ẢNH SẢN PHẨM *@
+                <div class="mb-3 border p-3 bg-light rounded">
+                    <label class="form-label fw-bold text-primary"><i class="bi bi-image me-1"></i>Hình ảnh sản phẩm</label>
+                    <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                    <span class="text-muted small">Khuyên dùng ảnh tỷ lệ vuông, định dạng .jpg, .png hoặc .webp</span>
                 </div>
 
-                <div class="d-flex gap-2 justify-content-end">
-                    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
-                    <button type="submit" class="btn bg-success text-white">Lưu dữ liệu</button>
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-bold">Mô tả chi tiết</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Nhập thông tin về tròng kính, chất liệu gọng..."></textarea>
+                </div>
+
+                <div class="d-flex gap-2 justify-content-end mt-4 pt-3 border-top">
+                    <a asp-action="Index" class="btn btn-secondary px-4">Quay lại</a>
+                    <button type="submit" class="btn btn-success px-4"><i class="bi bi-save me-1"></i> Lưu Sản Phẩm</button>
                 </div>
             </form>
+
         </div>
     </div>
 </div>

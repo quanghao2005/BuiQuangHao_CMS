@@ -1,11 +1,11 @@
-﻿/*
+/*
  * Họ Tên : Bùi Quang Hào
  * MSSV : 2123110043
  */
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CMS.Data;
-using CMS.Data.Entities; // Đã bổ sung: Kết nối tới thư mục chứa các lớp thực thể Order, OrderDetail
+using CMS.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -24,104 +24,107 @@ namespace CMS.Backend.Controllers
             _context = context;
         }
 
-        /// <summary>
-        /// API: Tiếp nhận đơn đặt hàng kèm chi tiết giỏ hàng từ FrontEnd gửi lên
-        /// Đường dẫn: POST https://localhost:xxxx/api/Orders
-        /// </summary>
-        [HttpPost]
-        public async Task<IActionResult> CreateOrder([FromBody] OrderInputDTO input)
+        [HttpPost("Checkout")]
+        public async Task<IActionResult> Checkout([FromBody] CheckoutRequestDTO input)
         {
-            // 1. Kiểm tra kịch bản lỗi bảo vệ: Nếu dữ liệu truyền lên trống rỗng hoặc không có sản phẩm nào
-            if (input == null || input.CartItems == null || input.CartItems.Count == 0)
+            if (input == null || input.OrderDetails == null || input.OrderDetails.Count == 0)
             {
-                return BadRequest(new { message = "Dữ liệu đơn hàng hoặc giỏ hàng không hợp lệ!" });
+                return BadRequest(new { message = "Giỏ hàng rỗng hoặc dữ liệu không hợp lệ!" });
             }
 
-            // Sử dụng cơ chế Transaction để đảm bảo: Nếu lưu chi tiết đơn hàng lỗi thì tự động hủy luôn đơn hàng cha
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    // --- BƯỚC A: KHỞI TẠO VÀ LƯU THÔNG TIN ĐƠN HÀNG TỔNG QUÁT ---
+                    // 1. Tìm hoặc tạo mới Customer
+                    var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == input.CustomerEmail || c.Phone == input.CustomerPhone);
+                    if (customer == null)
+                    {
+                        customer = new Customer
+                        {
+                            FullName = input.CustomerName,
+                            Email = input.CustomerEmail ?? "guest@example.com",
+                            Phone = input.CustomerPhone,
+                            Address = input.CustomerAddress,
+                            Password = "GuestPassword123" // Mặc định cho guest
+                        };
+                        _context.Customers.Add(customer);
+                        await _context.SaveChangesAsync();
+                    }
+
+                    // 2. Tạo Order
                     var newOrder = new Order
                     {
-                        OrderDate = DateTime.Now,    // Tự động lấy ngày giờ thực tế máy tính lúc mua
-                        CustomerId = input.CustomerId,
-                        Status = 0,                  // 0: Mặc định đơn hàng mới ở trạng thái "Chờ duyệt"
-                        Notes = input.Notes
+                        OrderDate = DateTime.Now,
+                        CustomerId = customer.Id,
+                        Status = 0,
+                        Notes = input.Note
                     };
 
                     _context.Orders.Add(newOrder);
-                    await _context.SaveChangesAsync(); // Ép hệ thống sinh ra mã ID Đơn hàng (newOrder.Id) tự động tăng
+                    await _context.SaveChangesAsync();
 
-                    // --- BƯỚC B: VÒNG LẶP DUYỆT GIỎ HÀNG ĐỂ LƯU CHI TIẾT ĐƠN HÀNG ---
-                    foreach (var item in input.CartItems)
+                    // 3. Xử lý OrderDetails và trừ Stock
+                    foreach (var item in input.OrderDetails)
                     {
-                        // Truy vấn nhanh từ DB để lấy giá bán thực tế của sản phẩm tại thời điểm mua
                         var product = await _context.Products.FindAsync(item.ProductId);
                         if (product == null)
                         {
-                            return BadRequest(new { message = $"Sản phẩm có ID {item.ProductId} không tồn tại trên hệ thống!" });
+                            return BadRequest(new { message = $"Sản phẩm ID {item.ProductId} không tồn tại!" });
                         }
 
-                        // Kiểm tra số lượng tồn kho (Bảo vệ hệ thống)
                         if (product.StockQuantity < item.Quantity)
                         {
-                            return BadRequest(new { message = $"Sản phẩm {product.Name} không đủ số lượng trong kho!" });
+                            return BadRequest(new { message = $"Sản phẩm {product.Name} không đủ tồn kho!" });
                         }
 
-                        // Khởi tạo thực thể Chi tiết đơn hàng (OrderDetail)
                         var orderDetail = new OrderDetail
                         {
-                            OrderId = newOrder.Id, // Gắn mã ID đơn hàng vừa đẻ ra ở Bước A vào đây
+                            OrderId = newOrder.Id,
                             ProductId = item.ProductId,
                             Quantity = item.Quantity,
-                            UnitPrice = product.Price // Lấy giá gốc của sản phẩm nạp vào hóa đơn
+                            UnitPrice = product.Price
                         };
 
-                        // Trừ bớt số lượng tồn kho của sản phẩm
                         product.StockQuantity -= item.Quantity;
-
                         _context.OrderDetails.Add(orderDetail);
                     }
 
-                    // Chốt lưu toàn bộ danh sách chi tiết đơn hàng và cập nhật lại kho sản phẩm xuống SQL Server
                     await _context.SaveChangesAsync();
-
-                    // Xác nhận hoàn tất toàn bộ tiến trình giao dịch an toàn
                     await transaction.CommitAsync();
 
-                    // Trả về mã thành công 201 Created và gửi ngược lại mã ID đơn hàng vừa tạo cho Frontend
-                    return StatusCode(201, new
-                    {
-                        message = "Đặt hàng thành công trọn vẹn!",
-                        orderId = newOrder.Id
-                    });
+                    // Gửi email xác nhận
+                    string emailBody = $"<h3>Cảm ơn {customer.FullName} đã đặt hàng!</h3>" +
+                                       $"<p>Mã đơn hàng của bạn là: <b>{newOrder.Id}</b></p>" +
+                                       $"<p>Tổng tiền: <b>{input.OrderDetails.Sum(o => o.Quantity * o.Price).ToString("N0")} ₫</b></p>" +
+                                       $"<p>Chúng tôi sẽ giao hàng đến: {customer.Address}</p>";
+                    await CMS.Backend.Helpers.EmailHelper.SendEmailAsync(customer.Email, "Xác nhận đơn hàng HaoCMS", emailBody);
+
+                    return StatusCode(201, new { message = "Đặt hàng thành công!" });
                 }
                 catch (Exception ex)
                 {
-                    // Nếu có bất kỳ lỗi nào xảy ra, hủy bỏ toàn bộ dữ liệu rác vừa thêm vào bộ nhớ tạm
                     await transaction.RollbackAsync();
-                    return StatusCode(500, new { message = "Lỗi xử lý tạo đơn hàng ngầm", detail = ex.Message });
+                    return StatusCode(500, new { message = "Lỗi tạo đơn hàng", detail = ex.Message });
                 }
             }
         }
     }
 
-    // ====================================================================================
-    // HỆ THỐNG CÁC LỚP TRUNG GIAN DTO ĐỂ HỨNG DỮ LIỆU TỪ GIỎ HÀNG REACTJS TRUYỀN LÊN
-    // ====================================================================================
-
-    public class OrderInputDTO
+    public class CheckoutRequestDTO
     {
-        public int CustomerId { get; set; }
-        public string Notes { get; set; }
-        public List<CartItemDTO> CartItems { get; set; } // Danh sách mảng các sản phẩm chọn mua
+        public string CustomerName { get; set; }
+        public string CustomerEmail { get; set; }
+        public string CustomerPhone { get; set; }
+        public string CustomerAddress { get; set; }
+        public string Note { get; set; }
+        public List<CheckoutItemDTO> OrderDetails { get; set; }
     }
 
-    public class CartItemDTO
+    public class CheckoutItemDTO
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }
+        public decimal Price { get; set; }
     }
 }

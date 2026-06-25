@@ -6,10 +6,11 @@
         <a href="/Product/Create" class="btn btn-success rounded-pill"><i class="bi bi-plus-lg"></i> Thêm Sản Phẩm</a>
     </div>
 
-    <table class="table table-bordered table-hover bg-white shadow-sm text-center">
+    <table class="table table-bordered table-hover bg-white shadow-sm text-center align-middle">
         <thead class="table-dark">
             <tr>
                 <th>ID</th>
+                <th>Hình Ảnh</th>
                 <th>Tên Sản Phẩm</th>
                 <th>Giá Bán</th>
                 <th>Số Lượng Kho</th>
@@ -23,6 +24,13 @@
                 {
                     <tr>
                         <td>@p.Id</td>
+                        <td>
+                            @* Hiển thị ảnh: Nếu chưa có ảnh thì dùng ảnh mặc định *@
+                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/no-image.png" : p.ImageUrl)"
+                                 alt="@p.Name"
+                                 class="img-thumbnail"
+                                 style="width: 60px; height: 60px; object-fit: cover;" />
+                        </td>
                         <td class="fw-bold text-primary">@p.Name</td>
                         <td>@p.Price.ToString("N0") đ</td>
                         <td>@p.StockQuantity</td>

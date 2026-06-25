@@ -1,8 +1,8 @@
-﻿import axios from 'axios';
+import axios from 'axios';
 
 // Khởi tạo một thực thể axios với cấu hình base chung
 const axiosClient = axios.create({
-    baseURL: 'https://localhost:7271/api', // Đổi lại đúng cổng Port Backend của máy các em
+    baseURL: process.env.REACT_APP_API_URL || 'https://localhost:7271/api', // Đọc từ file .env
     headers: {
         'Content-Type': 'application/json',
     },
