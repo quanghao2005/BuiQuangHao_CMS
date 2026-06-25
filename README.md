@@ -1,7 +1,10 @@
-📂 BÁO CÁO TIẾN ĐỘ THỰC HÀNH - BUỔI 7 (WEB API INTEGRATION)
-Sinh viên: Bùi Quang Hào
+**👤 THÔNG TIN SINH VIÊN THỰC HIỆN**  
+**Họ và tên:** Bùi Quang Hào  
+**Mã số sinh viên (MSSV):** 2123110043  
+**Lớp:** CCQ2311B  
+**Năm thực hiện:** 2026  
 
-MSSV: 2123110043
+📂 BÁO CÁO TIẾN ĐỘ THỰC HÀNH - BUỔI 7 (WEB API INTEGRATION)
 
 Dự án: Hệ thống quản lý website cửa hàng điện thoại (Phone Store CMS)
 
