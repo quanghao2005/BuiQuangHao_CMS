@@ -1,13 +1,13 @@
-﻿@model CMS.Data.Entities.Order
+@model CMS.Data.Entities.Order
 @{
-    Layout = "_Layout";
-    ViewData["Title"] = "Cập nhật đơn hàng #" + Model.Id;
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "C?p nh?t don h�ng #" + Model.Id;
 }
 
 <div class="container mt-4">
     <div class="card shadow" style="max-width: 650px; margin: 0 auto;">
         <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square"></i> CẬP NHẬT THÔNG TIN ĐƠN HÀNG #@Model.Id</h5>
+            <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square"></i> C?P NH?T TH�NG TIN �ON H�NG #@Model.Id</h5>
         </div>
         <div class="card-body">
             <form asp-action="Edit" method="post">
@@ -16,13 +16,13 @@
                 <input type="hidden" asp-for="OrderDate" /> <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                 <div class="mb-3">
-                    <label asp-for="CustomerId" class="form-label fw-bold">Khách hàng đặt đơn</label>
+                    <label asp-for="CustomerId" class="form-label fw-bold">Kh�ch h�ng d?t don</label>
                     <select asp-for="CustomerId" class="form-select" required>
                         @if (ViewBag.Customers != null)
                         {
                             foreach (var cust in ViewBag.Customers)
                             {
-                                <option value="@cust.Id">Mã KH: @cust.Id - @(cust.GetType().GetProperty("Name") != null ? cust.Name : (cust.GetType().GetProperty("FullName") != null ? cust.FullName : "Khách hàng"))</option>
+                                <option value="@cust.Id">M� KH: @cust.Id - @(cust.GetType().GetProperty("Name") != null ? cust.Name : (cust.GetType().GetProperty("FullName") != null ? cust.FullName : "Kh�ch h�ng"))</option>
                             }
                         }
                     </select>
@@ -30,24 +30,24 @@
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Status" class="form-label fw-bold">Trạng thái xử lý</label>
+                    <label asp-for="Status" class="form-label fw-bold">Tr?ng th�i x? l�</label>
                     <select asp-for="Status" class="form-select">
-                        <option value="0">0: Chờ duyệt (Hệ thống tiếp nhận)</option>
-                        <option value="1">1: Đang giao (Đã đóng gói hàng)</option>
-                        <option value="2">2: Đã xong (Hoàn tất giao dịch)</option>
+                        <option value="0">0: Ch? duy?t (H? th?ng ti?p nh?n)</option>
+                        <option value="1">1: �ang giao (�� d�ng g�i h�ng)</option>
+                        <option value="2">2: �� xong (Ho�n t?t giao d?ch)</option>
                     </select>
                     <span asp-validation-for="Status" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Notes" class="form-label fw-bold">Ghi chú nội bộ</label>
-                    <textarea asp-for="Notes" class="form-control" rows="4" placeholder="Nhập ghi chú giao đơn, thông tin thêm..."></textarea>
+                    <label asp-for="Notes" class="form-label fw-bold">Ghi ch� n?i b?</label>
+                    <textarea asp-for="Notes" class="form-control" rows="4" placeholder="Nh?p ghi ch� giao don, th�ng tin th�m..."></textarea>
                     <span asp-validation-for="Notes" class="text-danger small"></span>
                 </div>
 
                 <div class="d-flex gap-2 justify-content-end">
-                    <a href="/Order" class="btn btn-secondary">Hủy bỏ</a>
-                    <button type="submit" class="btn btn-warning fw-bold">Cập nhật ngay</button>
+                    <a href="/Order" class="btn btn-secondary">H?y b?</a>
+                    <button type="submit" class="btn btn-warning fw-bold">C?p nh?t ngay</button>
                 </div>
             </form>
         </div>

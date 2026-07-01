@@ -1,19 +1,19 @@
-Ôªø@model IEnumerable<CMS.Data.Entities.Customer>
+@model IEnumerable<CMS.Data.Entities.Customer>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="fw-bold">QU·∫¢N L√ù KH√ÅCH H√ÄNG</h3>
-        <a href="/Customer/Create" class="btn btn-success rounded-pill"><i class="bi bi-plus-lg"></i> Th√™m Kh√°ch H√†ng</a>
+        <h3 class="fw-bold">QU?N L› KH¡CH H¿NG</h3>
+        <a href="/Customer/Create" class="btn btn-success rounded-pill"><i class="bi bi-plus-lg"></i> ThÍm Kh·ch H‡ng</a>
     </div>
 
     <table class="table table-bordered table-hover bg-white shadow-sm text-center">
         <thead class="table-dark">
             <tr>
                 <th>ID</th>
-                <th>H·ªç V√† T√™n</th>
+                <th>H? V‡ TÍn</th>
                 <th>Email</th>
-                <th>S·ªë ƒêi·ªán Tho·∫°i</th>
-                <th>H√†nh ƒê·ªông</th>
+                <th>S? –i?n Tho?i</th>
+                <th>H‡nh –?ng</th>
             </tr>
         </thead>
         <tbody>
@@ -28,10 +28,10 @@
                         <td>@c.Phone</td>
                         <td>
                             <div class="d-flex justify-content-center gap-2">
-                                <a href="/Customer/Edit/@c.Id" class="btn btn-sm btn-warning rounded-pill px-3">S·ª≠a</a>
-                                <form action="/Customer/Delete/@c.Id" method="post" onsubmit="return confirm('X√≥a kh√°ch h√†ng n√†y?');">
+                                <a href="/Customer/Edit/@c.Id" class="btn btn-sm btn-warning rounded-pill px-3">S?a</a>
+                                <form action="/Customer/Delete/@c.Id" method="post" onsubmit="return confirm('XÛa kh·ch h‡ng n‡y?');">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">X√≥a</button>
+                                    <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">XÛa</button>
                                 </form>
                             </div>
                         </td>

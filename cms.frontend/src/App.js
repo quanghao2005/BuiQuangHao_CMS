@@ -9,6 +9,8 @@ import PriceFilter from './components/PriceFilter';
 import ProductList from './components/ProductList';
 import PostList from './components/PostList';
 import HotProductList from './components/HotProductList';
+import FeaturedProductList from './components/FeaturedProductList';
+import NewProductList from './components/NewProductList';
 import BannerCarousel from './components/BannerCarousel';
 import SearchBar from './components/SearchBar';
 
@@ -141,6 +143,8 @@ function App() {
                 {isHomePage && (
                     <div className="fade-in-up delay-100">
                         <HotProductList />
+                        <FeaturedProductList />
+                        <NewProductList />
                     </div>
                 )}
 

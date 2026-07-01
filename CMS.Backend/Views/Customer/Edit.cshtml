@@ -1,9 +1,9 @@
-﻿@model CMS.Data.Entities.Customer
+@model CMS.Data.Entities.Customer
 
 <div class="container mt-4">
     <div class="card shadow-sm border-0 rounded-3">
         <div class="card-header bg-warning text-dark py-3">
-            <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square"></i> CHỈNH SỬA THÔNG TIN KHÁCH HÀNG</h5>
+            <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square"></i> CH?NH S?A TH�NG TIN KH�CH H�NG</h5>
         </div>
         <div class="card-body p-4 bg-white">
             <form asp-action="Edit" method="post">
@@ -14,7 +14,7 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Họ và Tên:</label>
+                    <label class="form-label fw-bold">H? v� T�n:</label>
                     <input asp-for="FullName" class="form-control" required />
                 </div>
                 <div class="mb-3">
@@ -22,17 +22,17 @@
                     <input asp-for="Email" class="form-control" required />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Số điện thoại:</label>
+                    <label class="form-label fw-bold">S? di?n tho?i:</label>
                     <input asp-for="Phone" class="form-control" required />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Mật khẩu:</label>
+                    <label class="form-label fw-bold">M?t kh?u:</label>
                     <input type="password" asp-for="Password" class="form-control" required />
                 </div>
 
                 <div class="d-flex justify-content-between">
-                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">Quay lại</a>
-                    <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Cập nhật</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">Quay l?i</a>
+                    <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">C?p nh?t</button>
                 </div>
             </form>
         </div>

@@ -1,14 +1,14 @@
-﻿@model IEnumerable<CMS.Data.Entities.CategoryProduct>
+@model IEnumerable<CMS.Data.Entities.CategoryProduct>
 @{
-    Layout = "_Layout";
-    ViewData["Title"] = "Danh mục sản phẩm";
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Danh m?c s?n ph?m";
 }
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="text-dark fw-bold"><i class="bi bi-tags-fill"></i> QUẢN LÝ DANH MỤC SẢN PHẨM</h4>
+        <h4 class="text-dark fw-bold"><i class="bi bi-tags-fill"></i> QU?N L� DANH M?C S?N PH?M</h4>
         <a href="/CategoryProduct/Create" class="btn btn-success fw-bold">
-            <i class="bi bi-plus-circle-fill"></i> Thêm danh mục mới
+            <i class="bi bi-plus-circle-fill"></i> Th�m danh m?c m?i
         </a>
     </div>
 
@@ -17,10 +17,10 @@
             <table class="table table-hover table-striped mb-0 align-middle">
                 <thead class="table-dark">
                     <tr>
-                        <th style="width: 100px;" class="text-center">Mã ID</th>
-                        <th>Tên danh mục sản phẩm</th>
-                        <th>Mô tả chi tiết</th>
-                        <th style="width: 200px;" class="text-center">Hành động</th>
+                        <th style="width: 100px;" class="text-center">M� ID</th>
+                        <th>T�n danh m?c s?n ph?m</th>
+                        <th>M� t? chi ti?t</th>
+                        <th style="width: 200px;" class="text-center">H�nh d?ng</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,18 +31,18 @@
                             <tr>
                                 <td class="text-center fw-bold">@item.Id</td>
                                 <td class="text-primary fw-bold">@item.Name</td>
-                                <td class="text-muted">@(string.IsNullOrEmpty(item.Description) ? "Chưa có mô tả" : item.Description)</td>
+                                <td class="text-muted">@(string.IsNullOrEmpty(item.Description) ? "Chua c� m� t?" : item.Description)</td>
                                 <td>
                                     <div class="d-flex gap-2 justify-content-center">
                                         <a href="/CategoryProduct/Edit/@item.Id" class="btn btn-sm btn-warning fw-bold">
-                                            <i class="bi bi-pencil-square"></i> Sửa
+                                            <i class="bi bi-pencil-square"></i> S?a
                                         </a>
 
                                         <form action="/CategoryProduct/Delete/@item.Id" method="post"
-                                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa danh mục này không?');" class="m-0">
+                                              onsubmit="return confirm('B?n c� ch?c ch?n mu?n x�a danh m?c n�y kh�ng?');" class="m-0">
                                             @Html.AntiForgeryToken()
                                             <button type="submit" class="btn btn-sm btn-danger fw-bold">
-                                                <i class="bi bi-trash-fill"></i> Xóa
+                                                <i class="bi bi-trash-fill"></i> X�a
                                             </button>
                                         </form>
                                     </div>
@@ -53,7 +53,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="4" class="text-center text-muted py-4">Hiện tại chưa có dữ liệu danh mục sản phẩm nào.</td>
+                            <td colspan="4" class="text-center text-muted py-4">Hi?n t?i chua c� d? li?u danh m?c s?n ph?m n�o.</td>
                         </tr>
                     }
                 </tbody>

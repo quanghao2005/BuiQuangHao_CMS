@@ -1,4 +1,4 @@
-﻿// Họ Tên: Bùi Quang Hào
+// Họ Tên: Bùi Quang Hào
 // MSSV: 2123110043
 using Microsoft.AspNetCore.Mvc;
 using CMS.Data;
@@ -30,6 +30,12 @@ namespace CMS.Backend.Controllers
             {
                 try
                 {
+                    // Mã hóa mật khẩu trước khi lưu
+                    if (!string.IsNullOrEmpty(model.PasswordHash) && !model.PasswordHash.StartsWith("$2"))
+                    {
+                        model.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.PasswordHash);
+                    }
+
                     _context.Users.Add(model);
                     _context.SaveChanges();
                     return RedirectToAction("Index");
@@ -62,7 +68,20 @@ namespace CMS.Backend.Controllers
                 try
                 {
                     userInDb.FullName = model.FullName;
-                    userInDb.PasswordHash = model.PasswordHash;
+                    
+                    // Tiến hành mã hóa nếu mật khẩu gửi lên chưa được mã hóa BCrypt
+                    if (!string.IsNullOrEmpty(model.PasswordHash))
+                    {
+                        if (!model.PasswordHash.StartsWith("$2"))
+                        {
+                            userInDb.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.PasswordHash);
+                        }
+                        else
+                        {
+                            userInDb.PasswordHash = model.PasswordHash;
+                        }
+                    }
+
                     userInDb.Role = model.Role;
 
                     _context.Users.Update(userInDb);

@@ -1,41 +1,41 @@
-﻿@model CMS.Data.Entities.Category
+@model CMS.Data.Entities.Category
 
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card shadow border-0 rounded-3">
                 <div class="card-header bg-success text-white py-3 text-center">
-                    <h4 class="mb-0 fw-bold"><i class="bi bi-plus-circle"></i> THÊM DANH MỤC MỚI</h4>
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-plus-circle"></i> TH�M DANH M?C M?I</h4>
                 </div>
                 <div class="card-body p-4">
-                    @* CHUẨN: Gọi đúng Action Create với Method POST *@
+                    @* CHU?N: G?i d�ng Action Create v?i Method POST *@
                     <form asp-controller="Category" asp-action="Create" method="post">
                         @Html.AntiForgeryToken()
 
-                        @* Hiển thị danh sách lỗi cụ thể nếu hệ thống từ chối lưu *@
+                        @* Hi?n th? danh s�ch l?i c? th? n?u h? th?ng t? ch?i luu *@
                         <div asp-validation-summary="All" class="text-danger mb-3 fw-bold"></div>
 
-                        @* Ô nhập Tên danh mục (Thêm name="Name" để ép ép dữ liệu truyền đi) *@
+                        @* � nh?p T�n danh m?c (Th�m name="Name" d? �p �p d? li?u truy?n di) *@
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Tên Danh Mục:</label>
-                            <input type="text" asp-for="Name" name="Name" class="form-control" placeholder="Ví dụ: Công nghệ AI, Thể thao..." required />
+                            <label class="form-label fw-bold">T�n Danh M?c:</label>
+                            <input type="text" asp-for="Name" name="Name" class="form-control" placeholder="V� d?: C�ng ngh? AI, Th? thao..." required />
                             <span asp-validation-for="Name" class="text-danger small"></span>
                         </div>
 
-                        @* Ô nhập Mô tả danh mục (Thêm name="Description") *@
+                        @* � nh?p M� t? danh m?c (Th�m name="Description") *@
                         <div class="mb-4">
-                            <label class="form-label fw-bold">Mô Tả:</label>
-                            <textarea asp-for="Description" name="Description" class="form-control" rows="3" placeholder="Nhập mô tả ngắn..."></textarea>
+                            <label class="form-label fw-bold">M� T?:</label>
+                            <textarea asp-for="Description" name="Description" class="form-control" rows="3" placeholder="Nh?p m� t? ng?n..."></textarea>
                             <span asp-validation-for="Description" class="text-danger small"></span>
                         </div>
 
-                        @* Hệ thống nút bấm *@
+                        @* H? th?ng n�t b?m *@
                         <div class="d-flex justify-content-between">
                             <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
-                                <i class="bi bi-arrow-left"></i> Quay lại
+                                <i class="bi bi-arrow-left"></i> Quay l?i
                             </a>
                             <button type="submit" class="btn btn-success rounded-pill px-4 shadow-sm">
-                                <i class="bi bi-save"></i> Lưu Dữ Liệu
+                                <i class="bi bi-save"></i> Luu D? Li?u
                             </button>
                         </div>
                     </form>

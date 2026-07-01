@@ -16,10 +16,12 @@ const ProductList = () => {
                 setLoading(true);
                 let response;
                 const searchKeyword = searchParams.get('search') || '';
+                const minPrice = searchParams.get('minPrice') || '';
+                const maxPrice = searchParams.get('maxPrice') || '';
                 if (categoryId) {
-                    response = await productService.getProductsByCategory(categoryId, page, 9);
+                    response = await productService.getProductsByCategory(categoryId, page, 9, minPrice, maxPrice);
                 } else {
-                    response = await productService.getAllProducts(page, 9, searchKeyword);
+                    response = await productService.getAllProducts(page, 9, searchKeyword, minPrice, maxPrice);
                 }
 
                 const data = response.data ? response.data : response;
@@ -40,16 +42,7 @@ const ProductList = () => {
         fetchProducts();
     }, [categoryId, page, searchParams]);
 
-    // Lọc sản phẩm theo giá
-    const minPrice = searchParams.get('min');
-    const maxPrice = searchParams.get('max');
-
-    const filteredProducts = products.filter(product => {
-        const price = product.price || 0;
-        if (minPrice && price < parseInt(minPrice)) return false;
-        if (maxPrice && price > parseInt(maxPrice)) return false;
-        return true;
-    });
+    // Bỏ lọc client-side vì Backend đã xử lý lọc qua API
 
     if (loading) return (
         <div className="text-center py-5">
@@ -66,18 +59,18 @@ const ProductList = () => {
                     {searchParams.get('search') ? `KẾT QUẢ TÌM KIẾM CHO: "${searchParams.get('search')}"` : (categoryId ? 'SẢN PHẨM THEO DANH MỤC' : 'TẤT CẢ SẢN PHẨM')}
                 </h5>
                 <span className="text-muted small badge bg-light text-dark border">
-                    {filteredProducts.length} sản phẩm
+                    {products.length} sản phẩm
                 </span>
             </div>
 
-            {filteredProducts.length === 0 ? (
+            {products.length === 0 ? (
                 <div className="text-center py-5 text-muted bg-light rounded border">
                     <i className="fa-solid fa-box-open fs-1 mb-3 text-warning d-block"></i>
                     <p className="fs-5">Không tìm thấy sản phẩm nào phù hợp với tiêu chí của bạn</p>
                 </div>
             ) : (
                 <div className="row g-4"> {/* G-4 giúp tạo khoảng cách đều giữa các cột */}
-                    {filteredProducts.map((product) => (
+                    {products.map((product) => (
                         <div key={product.id} className="col-lg-4 col-md-6">
                             <div
                                 className="card h-100 border-0 shadow-sm custom-card-hover"
@@ -127,7 +120,7 @@ const ProductList = () => {
             )}
 
             {/* Pagination */}
-            {totalPages > 0 && filteredProducts.length > 0 && (
+            {totalPages > 0 && products.length > 0 && (
                 <div className="d-flex justify-content-center mt-5">
                     <nav>
                         <ul className="pagination">

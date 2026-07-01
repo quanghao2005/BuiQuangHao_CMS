@@ -18,10 +18,12 @@ namespace CMS.Backend.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env;
 
-        public OrdersController(ApplicationDbContext context)
+        public OrdersController(ApplicationDbContext context, Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
         }
 
         [HttpPost("Checkout")]
@@ -51,6 +53,14 @@ namespace CMS.Backend.Controllers
                         _context.Customers.Add(customer);
                         await _context.SaveChangesAsync();
                     }
+                    else
+                    {
+                        // Nếu tìm thấy khách hàng cũ (trùng số điện thoại/email), 
+                        // cập nhật lại Họ Tên và Địa chỉ mới nhất theo Form Đặt Hàng hiện tại.
+                        customer.FullName = input.CustomerName;
+                        customer.Address = input.CustomerAddress;
+                        _context.Customers.Update(customer);
+                    }
 
                     // 2. Tạo Order
                     var newOrder = new Order
@@ -65,6 +75,9 @@ namespace CMS.Backend.Controllers
                     await _context.SaveChangesAsync();
 
                     // 3. Xử lý OrderDetails và trừ Stock
+                    string productRowsHtml = "";
+                    var inlineImages = new Dictionary<string, string>();
+
                     foreach (var item in input.OrderDetails)
                     {
                         var product = await _context.Products.FindAsync(item.ProductId);
@@ -88,17 +101,82 @@ namespace CMS.Backend.Controllers
 
                         product.StockQuantity -= item.Quantity;
                         _context.OrderDetails.Add(orderDetail);
+
+                        // Xử lý hình ảnh nhúng (Embedded Image - CID)
+                        string cid = $"img_{product.Id}";
+                        string imgUrl = "";
+
+                        if (!string.IsNullOrEmpty(product.ImageUrl))
+                        {
+                            string physicalPath = System.IO.Path.Combine(_env.WebRootPath, product.ImageUrl.TrimStart('/'));
+                            if (System.IO.File.Exists(physicalPath))
+                            {
+                                if (!inlineImages.ContainsKey(cid))
+                                {
+                                    inlineImages.Add(cid, physicalPath);
+                                }
+                                imgUrl = $"cid:{cid}";
+                            }
+                        }
+
+                        if (string.IsNullOrEmpty(imgUrl))
+                        {
+                            imgUrl = "https://via.placeholder.com/60";
+                        }
+
+                        productRowsHtml += $@"
+                            <tr>
+                                <td style='padding: 12px 5px; border-bottom: 1px solid #eee;'>
+                                    <img src='{imgUrl}' alt='{product.Name}' style='width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;' />
+                                </td>
+                                <td style='padding: 12px 5px; border-bottom: 1px solid #eee;'>
+                                    <strong style='color: #333; font-size: 15px;'>{product.Name}</strong>
+                                </td>
+                                <td style='padding: 12px 5px; border-bottom: 1px solid #eee; text-align: center; color: #555;'>
+                                    x{item.Quantity}
+                                </td>
+                                <td style='padding: 12px 5px; border-bottom: 1px solid #eee; text-align: right; color: #e11d48; font-weight: bold;'>
+                                    {(item.Price * item.Quantity).ToString("N0")} ₫
+                                </td>
+                            </tr>";
                     }
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    // Gửi email xác nhận
-                    string emailBody = $"<h3>Cảm ơn {customer.FullName} đã đặt hàng!</h3>" +
-                                       $"<p>Mã đơn hàng của bạn là: <b>{newOrder.Id}</b></p>" +
-                                       $"<p>Tổng tiền: <b>{input.OrderDetails.Sum(o => o.Quantity * o.Price).ToString("N0")} ₫</b></p>" +
-                                       $"<p>Chúng tôi sẽ giao hàng đến: {customer.Address}</p>";
-                    await CMS.Backend.Helpers.EmailHelper.SendEmailAsync(customer.Email, "Xác nhận đơn hàng HaoCMS", emailBody);
+                    // Gửi email xác nhận với Template HTML chuyên nghiệp
+                    string emailBody = $@"
+                        <div style='font-family: ""Segoe UI"", Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);'>
+                            <div style='background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 25px; text-align: center; color: white;'>
+                                <h2 style='margin: 0; font-size: 24px; letter-spacing: 1px;'>XÁC NHẬN ĐƠN HÀNG</h2>
+                                <p style='margin: 8px 0 0 0; opacity: 0.9; font-size: 14px;'>Cảm ơn bạn đã mua sắm tại HaoCMS Store!</p>
+                            </div>
+                            <div style='padding: 30px; background-color: #ffffff;'>
+                                <p style='font-size: 16px; color: #374151;'>Xin chào <strong style='color: #111827;'>{customer.FullName}</strong>,</p>
+                                <p style='font-size: 15px; color: #4b5563; line-height: 1.5;'>Đơn hàng <strong style='color: #4f46e5;'>#{newOrder.Id}</strong> của bạn đã được tiếp nhận và đang trong quá trình xử lý.</p>
+                                
+                                <h4 style='border-bottom: 2px solid #f3f4f6; padding-bottom: 10px; margin-top: 30px; color: #111827; font-size: 16px;'>🛍️ CHI TIẾT ĐƠN HÀNG</h4>
+                                <table style='width: 100%; border-collapse: collapse; margin-bottom: 20px;'>
+                                    {productRowsHtml}
+                                </table>
+                                
+                                <div style='text-align: right; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #d1d5db;'>
+                                    <span style='font-size: 16px; color: #4b5563;'>Tổng cộng: </span>
+                                    <strong style='color: #e11d48; font-size: 24px;'>{input.OrderDetails.Sum(o => o.Quantity * o.Price).ToString("N0")} ₫</strong>
+                                </div>
+                                
+                                <h4 style='border-bottom: 2px solid #f3f4f6; padding-bottom: 10px; margin-top: 35px; color: #111827; font-size: 16px;'>📍 THÔNG TIN GIAO HÀNG</h4>
+                                <table style='width: 100%; font-size: 15px; color: #4b5563;'>
+                                    <tr><td style='padding: 4px 0; width: 100px;'><strong>Người nhận:</strong></td><td>{customer.FullName}</td></tr>
+                                    <tr><td style='padding: 4px 0;'><strong>Điện thoại:</strong></td><td>{customer.Phone}</td></tr>
+                                    <tr><td style='padding: 4px 0;'><strong>Địa chỉ:</strong></td><td>{customer.Address}</td></tr>
+                                </table>
+                            </div>
+                            <div style='background-color: #f9fafb; padding: 20px; text-align: center; font-size: 13px; color: #6b7280; border-top: 1px solid #e5e7eb;'>
+                                &copy; 2026 HaoCMS Store. Mọi thắc mắc vui lòng liên hệ hotline: 1800-1234.
+                            </div>
+                        </div>";
+                    await CMS.Backend.Helpers.EmailHelper.SendEmailAsync(customer.Email, "Xác nhận đơn hàng HaoCMS", emailBody, inlineImages);
 
                     return StatusCode(201, new { message = "Đặt hàng thành công!" });
                 }

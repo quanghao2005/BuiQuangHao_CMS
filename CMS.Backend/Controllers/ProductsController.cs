@@ -25,13 +25,21 @@ namespace CMS.Backend.Controllers
         // HÀM 1: API LẤY TOÀN BỘ SẢN PHẨM (CÓ PHÂN TRANG)
         // ====================================================================================
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] string? search = null, [FromQuery] int page = 1, [FromQuery] int limit = 10)
+        public async Task<IActionResult> GetAll([FromQuery] string? search = null, [FromQuery] int page = 1, [FromQuery] int limit = 10, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null)
         {
             var query = _context.Products.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(p => p.Name.Contains(search));
+            }
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
             }
 
             query = query.OrderByDescending(p => p.Id);
@@ -63,9 +71,20 @@ namespace CMS.Backend.Controllers
         // HÀM 2: API LỌC SẢN PHẨM THEO DANH MỤC (CÓ PHÂN TRANG)
         // ====================================================================================
         [HttpGet("Category/{categoryId}")]
-        public async Task<IActionResult> GetByCategoryProduct(int categoryId, [FromQuery] int page = 1, [FromQuery] int limit = 10)
+        public async Task<IActionResult> GetByCategoryProduct(int categoryId, [FromQuery] int page = 1, [FromQuery] int limit = 10, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null)
         {
-            var query = _context.Products.Where(p => p.CategoryProductId == categoryId).OrderByDescending(p => p.Id);
+            var query = _context.Products.Where(p => p.CategoryProductId == categoryId).AsQueryable();
+            
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            }
+
+            query = query.OrderByDescending(p => p.Id);
             var totalItems = await query.CountAsync();
             var totalPages = (int)System.Math.Ceiling(totalItems / (double)limit);
 
@@ -98,6 +117,47 @@ namespace CMS.Backend.Controllers
             // Tạm thời lấy 3 sản phẩm mới nhất làm sản phẩm hot
             var products = await _context.Products
                 .OrderByDescending(p => p.Id)
+                .Take(3)
+                .Select(p => new {
+                    p.Id,
+                    p.Name,
+                    p.Price,
+                    p.StockQuantity,
+                    ImageUrl = string.IsNullOrEmpty(p.ImageUrl) ? "/images/products/no-image.png" : p.ImageUrl
+                })
+                .ToListAsync();
+            return Ok(products);
+        }
+
+        // ====================================================================================
+        // HÀM MỚI: SẢN PHẨM NỔI BẬT (FEATURED PRODUCTS)
+        // ====================================================================================
+        [HttpGet("Featured")]
+        public async Task<IActionResult> GetFeaturedProducts()
+        {
+            var products = await _context.Products
+                .OrderByDescending(p => p.Price) // Lấy các sản phẩm đắt giá nhất làm nổi bật
+                .Take(3)
+                .Select(p => new {
+                    p.Id,
+                    p.Name,
+                    p.Price,
+                    p.StockQuantity,
+                    ImageUrl = string.IsNullOrEmpty(p.ImageUrl) ? "/images/products/no-image.png" : p.ImageUrl
+                })
+                .ToListAsync();
+            return Ok(products);
+        }
+
+        // ====================================================================================
+        // HÀM MỚI: SẢN PHẨM MỚI NHẬP VỀ (NEW ARRIVALS)
+        // ====================================================================================
+        [HttpGet("New")]
+        public async Task<IActionResult> GetNewProducts()
+        {
+            var products = await _context.Products
+                .OrderByDescending(p => p.Id)
+                .Skip(3) // Bỏ qua 3 sản phẩm đầu tiên (đã lọt vào Hot)
                 .Take(3)
                 .Select(p => new {
                     p.Id,
