@@ -1,0 +1,72 @@
+@model CMS.Data.Entities.Product
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Thêm s?n ph?m m?i";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-box-seam-fill"></i> Thêm S?n Ph?m M?i</h5>
+        </div>
+        <div class="card-body">
+
+            @* QUAN TR?NG: Ðã thêm enctype="multipart/form-data" d? h? tr? upload file *@
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-bold">Tên s?n ph?m</label>
+                    <input asp-for="Name" class="form-control" placeholder="Nh?p tên s?n ph?m..." />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CategoryProductId" class="form-label fw-bold">Danh m?c s?n ph?m</label>
+                    <select asp-for="CategoryProductId" class="form-select" required>
+                        <option value="">-- Ch?n danh m?c s?n ph?m --</option>
+                        @if (ViewBag.Categories != null)
+                        {
+                            foreach (var cat in ViewBag.Categories)
+                            {
+                                <option value="@cat.Id">@cat.Name</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="CategoryProductId" class="text-danger small"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Price" class="form-label fw-bold">Giá bán (VNÐ)</label>
+                        <input asp-for="Price" type="number" class="form-control" />
+                        <span asp-validation-for="Price" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="StockQuantity" class="form-label fw-bold">S? lu?ng kho</label>
+                        <input asp-for="StockQuantity" type="number" class="form-control" />
+                        <span asp-validation-for="StockQuantity" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                @* KHU V?C THÊM HÌNH ?NH S?N PH?M *@
+                <div class="mb-3 border p-3 bg-light rounded">
+                    <label class="form-label fw-bold text-primary"><i class="bi bi-image me-1"></i>Hình ?nh s?n ph?m</label>
+                    <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                    <span class="text-muted small">Khuyên dùng ?nh t? l? vuông, d?nh d?ng .jpg, .png ho?c .webp</span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-bold">Mô t? chi ti?t</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Nh?p thông tin v? tròng kính, ch?t li?u g?ng..."></textarea>
+                </div>
+
+                <div class="d-flex gap-2 justify-content-end mt-4 pt-3 border-top">
+                    <a asp-action="Index" class="btn btn-secondary px-4">Quay l?i</a>
+                    <button type="submit" class="btn btn-success px-4"><i class="bi bi-save me-1"></i> Luu S?n Ph?m</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

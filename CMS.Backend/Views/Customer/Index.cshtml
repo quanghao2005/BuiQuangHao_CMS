@@ -1,24 +1,42 @@
-Ôªø@model IEnumerable<CMS.Data.Entities.Customer>
+@model IEnumerable<CMS.Data.Entities.Customer>
+
 <div class="container mt-4">
-    <h2 class="text-success mb-3">DANH S√ÅCH KH√ÅCH H√ÄNG</h2>
-    <table class="table table-bordered table-striped shadow-sm">
-        <thead class="table-success">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold">QU?N L› KH¡CH H¿NG</h3>
+        <a href="/Customer/Create" class="btn btn-success rounded-pill"><i class="bi bi-plus-lg"></i> ThÍm Kh·ch H‡ng</a>
+    </div>
+
+    <table class="table table-bordered table-hover bg-white shadow-sm text-center">
+        <thead class="table-dark">
             <tr>
                 <th>ID</th>
-                <th>T√™n Kh√°ch H√†ng</th>
+                <th>H? V‡ TÍn</th>
                 <th>Email</th>
-                <th>S·ªë ƒêi·ªán Tho·∫°i</th>
+                <th>S? –i?n Tho?i</th>
+                <th>H‡nh –?ng</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var c in Model)
+            @if (Model != null)
             {
-                <tr>
-                    <td>@c.Id</td>
-                    <td><strong>@c.FullName</strong></td>
-                    <td>@c.Email</td>
-                    <td>@c.Phone</td>
-                </tr>
+                foreach (var c in Model)
+                {
+                    <tr>
+                        <td>@c.Id</td>
+                        <td class="fw-bold">@c.FullName</td>
+                        <td>@c.Email</td>
+                        <td>@c.Phone</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="/Customer/Edit/@c.Id" class="btn btn-sm btn-warning rounded-pill px-3">S?a</a>
+                                <form action="/Customer/Delete/@c.Id" method="post" onsubmit="return confirm('XÛa kh·ch h‡ng n‡y?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">XÛa</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>

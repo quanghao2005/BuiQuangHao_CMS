@@ -1,14 +1,14 @@
-﻿@model IEnumerable<CMS.Data.Entities.OrderDetail>
+@model IEnumerable<CMS.Data.Entities.OrderDetail>
 <div class="container mt-4">
-    <h2 class="text-info mb-3">BÀI TẬP 7: CHI TIẾT CÁC HÓA ĐƠN</h2>
+    <h2 class="text-info mb-3">CHI TI?T C�C H�A �ON</h2>
     <table class="table table-bordered table-hover shadow-sm">
         <thead class="table-info text-dark">
             <tr>
                 <th>ID</th>
-                <th>Mã Đơn Đặt</th>
-                <th>Mã Sản Phẩm</th>
-                <th>Số Lượng Mua</th>
-                <th>Đơn Giá</th>
+                <th>M� �on �?t</th>
+                <th>M� S?n Ph?m</th>
+                <th>S? Lu?ng Mua</th>
+                <th>�on Gi�</th>
             </tr>
         </thead>
         <tbody>
@@ -16,10 +16,10 @@
             {
                 <tr>
                     <td>@od.Id</td>
-                    <td>Đơn hàng #@od.OrderId</td>
-                    <td>Sản phẩm #@od.ProductId</td>
+                    <td>�on h�ng #@od.OrderId</td>
+                    <td>S?n ph?m #@od.ProductId</td>
                     <td>@od.Quantity</td>
-                    <td>@od.UnitPrice.ToString("#,##0") đ</td>
+                    <td>@od.UnitPrice.ToString("#,##0") d</td>
                 </tr>
             }
         </tbody>

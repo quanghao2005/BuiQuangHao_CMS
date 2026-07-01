@@ -1,41 +1,35 @@
-Ôªø@model IEnumerable<CMS.Data.Entities.User>
+@model IEnumerable<CMS.Data.Entities.User>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="text-dark">QU·∫¢N L√ù TH√ÄNH VI√äN</h2>
-        <button class="btn btn-success btn-sm">+ Th√™m th√†nh vi√™n m·ªõi</button>
+        <h3 class="fw-bold">QU?N L› T¿I KHO?N</h3>
+        <a href="/User/Create" class="btn btn-success rounded-pill"><i class="bi bi-plus-lg"></i> ThÍm T‡i Kho?n</a>
     </div>
 
-    <table class="table table-hover shadow-sm border">
-        <thead class="table-light">
+    <table class="table table-bordered table-hover bg-white shadow-sm text-center">
+        <thead class="table-dark">
             <tr>
                 <th>ID</th>
-                <th>T√™n ƒêƒÉng Nh·∫≠p</th>
-                <th>H·ªç V√† T√™n</th>
-                <th>Quy·ªÅn H·∫°n</th>
-                <th>Thao T√°c</th>
+                <th>TÍn –ang Nh?p</th>
+                <th>Quy?n H?n</th>
+                <th>H‡nh –?ng</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var user in Model)
+            @foreach (var u in Model)
             {
                 <tr>
-                    <td>@user.Id</td>
-                    <td><strong>@user.Username</strong></td>
-                    <td>@user.FullName</td>
+                    <td>@u.Id</td>
+                    <td class="fw-bold">@u.Username</td>
+                    <td><span class="badge bg-primary">@u.Role</span></td>
                     <td>
-                        @if (user.Role == "Administrator")
-                        {
-                            <span class="badge bg-danger">@user.Role</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-info text-dark">@user.Role</span>
-                        }
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-warning">S·ª≠a</button>
-                        <button class="btn btn-sm btn-outline-danger">X√≥a</button>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="/User/Edit/@u.Id" class="btn btn-sm btn-warning rounded-pill px-3">S?a</a>
+                            <form action="/User/Delete/@u.Id" method="post" onsubmit="return confirm('XÛa t‡i kho?n n‡y?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">XÛa</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             }
